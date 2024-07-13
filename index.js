@@ -4,6 +4,7 @@ const swaggerDocument = require('./swagger/swagger.json');
 
 const UserHandler = require('./src/handler/userhandler');
 const itemHandler = require('./src/handler/itemhandler');
+const orderHandler = require('./src/handler/orderhandler');
 
 
 const app = express();
@@ -23,6 +24,13 @@ app.get('/items/:id', (req, res) => itemHandler.getItemById(req, res));
 app.put('/items/:id', (req, res) => itemHandler.updateItem(req, res));
 app.delete('/items/:id', (req, res) => itemHandler.deleteItem(req, res));
 app.patch('/items/:id/media', (req, res) => itemHandler.uploadMedia(req, res));
+
+//Route Order
+app.post('/api/orders', (req, res) => orderHandler.createOrder(req, res));
+app.get('/api/orders', (req, res) => orderHandler.getAllOrders(req, res));
+app.put('/api/orders/:id', (req, res) => orderHandler.updateOrder(req, res));
+app.delete('/api/orders/:id', (req, res) => orderHandler.deleteOrder(req, res));
+
 
 
 //Setup server
