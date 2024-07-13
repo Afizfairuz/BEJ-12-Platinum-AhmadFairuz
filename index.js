@@ -7,6 +7,7 @@ const UserHandler = require('./src/handler/userhandler');
 const itemHandler = require('./src/handler/itemhandler');
 const orderHandler = require('./src/handler/orderhandler');
 const promoHandler = require('./src/handler/promohandler');
+const paymentHandler = require('./src/handler/paymenthandler');
 
 
 const app = express();
@@ -39,6 +40,13 @@ app.get('/api/promos/eligible', (req, res) => promoHandler.getEligiblePromos(req
 app.post('/api/promos', (req, res) => promoHandler.createPromo(req, res));
 app.put('/api/promos/:promoId', (req, res) => promoHandler.updatePromo(req, res));
 app.delete('/api/promos/:promoId', (req, res) => promoHandler.deletePromo(req, res));
+
+//Route Payment
+app.get('/payments', (req, res) => paymentHandler.getAllPayments(req, res));
+app.get('/payments/:paymentId', (req, res) => paymentHandler.getPaymentById(req, res));
+app.post('/payments', (req, res) => paymentHandler.createPayment(req, res));
+app.put('/payments/:paymentId', (req, res) => paymentHandler.updatePayment(req, res));
+app.delete('/payments/:paymentId', (req, res) => paymentHandler.deletePayment(req, res));
 
 
 

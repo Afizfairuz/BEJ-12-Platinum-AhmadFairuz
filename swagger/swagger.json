@@ -1,14 +1,14 @@
 {
   "openapi": "3.0.0",
   "info": {
-    "title": "Order, Item, User, and Promo API",
+    "title": "Order, Item, User, Promo, and Payment API",
     "version": "1.0.0",
-    "description": "API untuk mengelola orders, items, users, dan promos"
+    "description": "API untuk mengelola orders, items, users, promos, dan payments"
   },
   "paths": {
     "/api/orders": {
       "post": {
-        "summary": "Buat order baru",
+        "summary": "Create a new order",
         "requestBody": {
           "required": true,
           "content": {
@@ -98,7 +98,7 @@
         }
       }
     },
-    "/items": {
+    "/api/items": {
       "get": {
         "summary": "Get all items",
         "responses": {
@@ -118,7 +118,7 @@
         }
       }
     },
-    "/items/{id}": {
+    "/api/items/{id}": {
       "get": {
         "summary": "Get item by id",
         "parameters": [
@@ -248,7 +248,7 @@
         }
       }
     },
-    "/users/{email}": {
+    "/api/users/{email}": {
       "get": {
         "summary": "Get user by email",
         "parameters": [
@@ -336,7 +336,7 @@
         }
       }
     },
-    "/users/{email}/profile-picture": {
+    "/api/users/{email}/profile-picture": {
       "patch": {
         "summary": "Update user profile picture",
         "parameters": [
@@ -385,7 +385,7 @@
         "summary": "Get all promos",
         "responses": {
           "200": {
-            "description": "Successful operation",
+            "description": "A list of promos",
             "content": {
               "application/json": {
                 "schema": {
@@ -393,16 +393,6 @@
                   "items": {
                     "$ref": "#/components/schemas/Promo"
                   }
-                }
-              }
-            }
-          },
-          "default": {
-            "description": "Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
                 }
               }
             }
@@ -416,84 +406,14 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/PromoInput"
+                "$ref": "#/components/schemas/Promo"
               }
             }
           }
         },
-        "responses": {
-          "201": {
-            "description": "Promo created successfully"
-          },
-          "default": {
-            "description": "Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/promos/eligible": {
-      "get": {
-        "summary": "Get eligible promos",
         "responses": {
           "200": {
             "description": "Successful operation",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Promo"
-                  }
-                }
-              }
-            }
-          },
-          "default": {
-            "description": "Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/promos/{promoId}": {
-      "put": {
-        "summary": "Update a promo by ID",
-        "parameters": [
-          {
-            "name": "promoId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/PromoInput"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Promo updated successfully",
             "content": {
               "application/json": {
                 "schema": {
@@ -513,12 +433,52 @@
             }
           }
         }
-      },
-      "delete": {
-        "summary": "Delete a promo by ID",
+      }
+    },
+    "/api/promos/{id}": {
+      "put": {
+        "summary": "Update promo by id",
         "parameters": [
           {
-            "name": "promoId",
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Promo"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Promo updated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Promo"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Promo not found"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete promo by id",
+        "parameters": [
+          {
+            "name": "id",
             "in": "path",
             "required": true,
             "schema": {
@@ -528,7 +488,37 @@
         ],
         "responses": {
           "200": {
-            "description": "Promo deleted successfully"
+            "description": "Promo deleted"
+          },
+          "404": {
+            "description": "Promo not found"
+          }
+        }
+      }
+    },
+    "/api/payments": {
+      "post": {
+        "summary": "Create a new payment",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Payment"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Payment"
+                }
+              }
+            }
           },
           "default": {
             "description": "Error",
@@ -541,25 +531,104 @@
             }
           }
         }
+      },
+      "get": {
+        "summary": "Get all payments",
+        "responses": {
+          "200": {
+            "description": "A list of payments",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Payment"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/payments/{id}": {
+      "put": {
+        "summary": "Update payment by id",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Payment"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Payment updated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Payment"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Payment not found"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete payment by id",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Payment deleted"
+          },
+          "404": {
+            "description": "Payment not found"
+          }
+        }
       }
     }
   },
   "components": {
     "schemas": {
-      "Order": {
+      "User": {
         "type": "object",
         "properties": {
-          "id": {
+          "email": {
             "type": "string"
           },
-          "product": {
+          "firstName": {
             "type": "string"
           },
-          "quantity": {
-            "type": "integer"
+          "lastName": {
+            "type": "string"
           },
-          "price": {
-            "type": "number"
+          "password": {
+            "type": "string"
           }
         }
       },
@@ -575,22 +644,36 @@
           "description": {
             "type": "string"
           },
-          "media": {
-            "type": "string"
+          "price": {
+            "type": "number"
           }
         }
       },
-      "User": {
+      "Order": {
         "type": "object",
         "properties": {
-          "email": {
+          "id": {
             "type": "string"
           },
-          "name": {
+          "userId": {
             "type": "string"
           },
-          "profilePicture": {
-            "type": "string"
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "itemId": {
+                  "type": "string"
+                },
+                "quantity": {
+                  "type": "integer"
+                }
+              }
+            }
+          },
+          "totalAmount": {
+            "type": "number"
           }
         }
       },
@@ -600,41 +683,35 @@
           "id": {
             "type": "string"
           },
-          "name": {
+          "code": {
             "type": "string"
           },
-          "description": {
-            "type": "string"
+          "discountPercentage": {
+            "type": "number"
           },
-          "startDate": {
-            "type": "string",
-            "format": "date"
-          },
-          "endDate": {
+          "validUntil": {
             "type": "string",
             "format": "date"
           }
         }
       },
-      "PromoInput": {
+      "Payment": {
         "type": "object",
         "properties": {
-          "name": {
+          "id": {
             "type": "string"
           },
-          "description": {
+          "orderId": {
             "type": "string"
           },
-          "startDate": {
-            "type": "string",
-            "format": "date"
+          "amount": {
+            "type": "number"
           },
-          "endDate": {
+          "status": {
             "type": "string",
-            "format": "date"
+            "enum": ["pending", "completed", "failed"]
           }
-        },
-        "required": ["name", "startDate", "endDate"]
+        }
       },
       "Error": {
         "type": "object",
