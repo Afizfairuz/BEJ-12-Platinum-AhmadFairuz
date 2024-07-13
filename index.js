@@ -1,6 +1,7 @@
 const express = require('express');
 const swaggerUi = require('swagger-ui-express');
 const swaggerDocument = require('./swagger/swagger.json');
+const path = require('path');
 
 const UserHandler = require('./src/handler/userhandler');
 const itemHandler = require('./src/handler/itemhandler');
