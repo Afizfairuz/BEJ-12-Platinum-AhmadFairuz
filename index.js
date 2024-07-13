@@ -5,6 +5,7 @@ const swaggerDocument = require('./swagger/swagger.json');
 const UserHandler = require('./src/handler/userhandler');
 const itemHandler = require('./src/handler/itemhandler');
 const orderHandler = require('./src/handler/orderhandler');
+const promoHandler = require('./src/handler/promohandler');
 
 
 const app = express();
@@ -30,6 +31,13 @@ app.post('/api/orders', (req, res) => orderHandler.createOrder(req, res));
 app.get('/api/orders', (req, res) => orderHandler.getAllOrders(req, res));
 app.put('/api/orders/:id', (req, res) => orderHandler.updateOrder(req, res));
 app.delete('/api/orders/:id', (req, res) => orderHandler.deleteOrder(req, res));
+
+//Route Promo 
+app.get('/api/promos', (req, res) => promoHandler.getAllPromos(req, res));
+app.get('/api/promos/eligible', (req, res) => promoHandler.getEligiblePromos(req, res));
+app.post('/api/promos', (req, res) => promoHandler.createPromo(req, res));
+app.put('/api/promos/:promoId', (req, res) => promoHandler.updatePromo(req, res));
+app.delete('/api/promos/:promoId', (req, res) => promoHandler.deletePromo(req, res));
 
 
 
