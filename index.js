@@ -1,12 +1,19 @@
 const express = require('express');
 const swaggerUi = require('swagger-ui-express');
-const YAML = require('yamljs');
-const path = require('path');
+const swaggerDocument = require('./swagger/swagger.json');
+
+const UserHandler = require('./src/handler/userhandler');
 
 const app = express();
-const swaggerDocument = YAML.load(path.join(__dirname, 'swagger', 'users.yaml'));
+app.use(express.json());
 
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+
+//Route User
+app.get('/users/:email', (req, res) => userHandler.getUserByEmail(req, res));
+app.put('/users/:email', (req, res) => userHandler.updateUser(req, res));
+app.delete('/users/:email', (req, res) => userHandler.deleteUser(req, res));
+app.patch('/users/:email/profile-picture', (req, res) => userHandler.updateUserProfilePicture(req, res));
 
 
 //Setup server
