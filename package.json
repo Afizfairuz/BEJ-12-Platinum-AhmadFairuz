@@ -1,17 +1,27 @@
 {
-  "name": "bej-12-platinum-ahmadfairuz",
+  "name": "bej-12-ahmadfairuz",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
+    "start": "node main.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "bcrypt": "^5.1.1",
+    "colors": "^1.4.0",
     "express": "^4.19.2",
-    "swagger-ui-express": "^5.0.1",
-    "yamljs": "^0.3.0"
+    "jsonwebtoken": "^9.0.2",
+    "pg": "^8.12.0",
+    "pg-hstore": "^2.3.4",
+    "postgres": "^3.4.4",
+    "sequelize": "^6.37.3",
+    "swagger-ui-express": "^5.0.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.3",
+    "sequelize-cli": "^6.6.2"
   }
 }
