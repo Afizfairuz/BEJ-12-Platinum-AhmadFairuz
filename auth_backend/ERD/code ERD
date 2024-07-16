@@ -1,0 +1,39 @@
+Table users {
+  id integer [primary key]
+  full_name varchar
+  email varchar
+  password text
+  created_at datetime
+}
+
+Table products {
+  id integer [primary key]
+  name varchar
+  price float
+  status varchar
+  created_at datetime
+  category_id int [ref: > categories.id]
+  user_id integer [ref: > users.id]
+}
+
+Table categories {
+  id integer [primary key]
+  name varchar
+  code varchar
+}
+
+Table orders {
+  id integer [primary key]
+  user_id integer [ref: > users.id]
+  status varchar
+  created_at datetime
+}
+
+Table items {
+  id integer [primary key]
+  order_id integer [ref: > orders.id]
+  product_id integer [ref: > products.id]
+  quantity integer
+  price float
+  created_at datetime
+}
