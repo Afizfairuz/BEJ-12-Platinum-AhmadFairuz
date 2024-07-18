@@ -53,7 +53,7 @@ const itemService = new ItemService(itemRepository);
 const authService = new AuthService(userRepository);
 
 // Inisialisasi handler
-const UserHandler = require("./auth_backend/handler/UserHandler");
+const UserHandler = require("./auth_backend/handler/userHandler");
 const ProductHandler = require("./auth_backend/handler/ProductHandler");
 const CategoryHandler = require("./auth_backend/handler/CategoryHandler");
 const OrderHandler = require("./auth_backend/handler/OrderHandler");
