@@ -38,7 +38,7 @@ const orderRepository = new OrderRepository();
 const itemRepository = new ItemRepository();
 
 // Inisialisasi service
-const UserService = require("./auth_backend/service/UserService");
+const UserService = require("./auth_backend/service/userService");
 const ProductService = require("./auth_backend/service/ProductService");
 const CategoryService = require("./auth_backend/service/CategoryService");
 const OrderService = require("./auth_backend/service/OrderService");
