@@ -62,6 +62,21 @@ class UserHandler {
     }
   }
 
+  async updateUserProfilePicture(req, res) {
+    try {
+      const { id } = req.params;
+      const { profilePicture } = req.body;
+      const updatedUser = await this.userService.updateUserProfilePicture(id, profilePicture);
+      if (updatedUser) {
+        res.json(updatedUser);
+      } else {
+        res.status(404).json({ message: "User not found" });
+      }
+    } catch (err) {
+      res.status(500).json({ message: err.message });
+    }
+  }
+
   async deleteUser(req, res) {
     try {
       const { id } = req.params;

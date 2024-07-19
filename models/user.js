@@ -28,6 +28,10 @@ User.init(
       type: DataTypes.STRING,
       allowNull: false,
     },
+    profilePicture: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
     createdAt: {
       type: DataTypes.DATE,
       allowNull: false,

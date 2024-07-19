@@ -47,6 +47,18 @@ class UserRepository {
     }
   }
 
+  async updateUserProfilePicture(id, profilePicture) {
+    try {
+      const updatedUser = await this.User.update(
+        { profilePicture },
+        { where: { id }, returning: true }
+      );
+      return updatedUser[1][0];
+    } catch (error) {
+      throw new Error(`Failed to update profile picture: ${error.message}`);
+    }
+  }
+
   async deleteUser(id) {
     try {
       const deletedUser = await this.User.destroy({ where: { id } });

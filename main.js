@@ -72,6 +72,7 @@ app.get("/users", (req, res) => userHandler.getAllUsers(req, res));
 app.post("/users", (req, res) => userHandler.createUser(req, res));
 app.get("/users/:email", (req, res) => userHandler.getUserByEmail(req, res));
 app.put("/users/:id", (req, res) => userHandler.updateUser(req, res));
+app.put("/users/:id/profilePicture", (req, res) => userHandler.updateUserProfilePicture(req, res));
 app.delete("/users/:id", (req, res) => userHandler.deleteUser(req, res));
 
 // Route untuk Product

@@ -21,6 +21,10 @@ class UserService {
     return await this.userRepository.updateUser(id, name, email, password);
   }
 
+  async updateUserProfilePicture(id, profilePicture) {
+    return await this.userRepository.updateUserProfilePicture(id, profilePicture);
+  }
+
   async deleteUser(id) {
     return await this.userRepository.deleteUser(id);
   }
