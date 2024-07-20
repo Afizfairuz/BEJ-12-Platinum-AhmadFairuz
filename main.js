@@ -1,7 +1,7 @@
 const express = require("express");
 const path = require("path");
 const app = express();
-const PORT = 8000;
+const PORT = 3883;
 
 // Middleware untuk parsing request body
 app.use(express.json());
@@ -74,15 +74,6 @@ app.get("/users/:email", (req, res) => userHandler.getUserByEmail(req, res));
 app.put("/users/:id", (req, res) => userHandler.updateUser(req, res));
 app.put("/users/:id/profilePicture", (req, res) => userHandler.updateUserProfilePicture(req, res));
 app.delete("/users/:id", (req, res) => userHandler.deleteUser(req, res));
-
-// Route untuk Product
-app.get("/products", (req, res) => productHandler.getAllProducts(req, res));
-app.post("/products", (req, res) => productHandler.createProduct(req, res));
-app.get("/products/:id", (req, res) => productHandler.getProductById(req, res));
-app.put("/products/:id", (req, res) => productHandler.updateProduct(req, res));
-app.delete("/products/:id", (req, res) =>
-  productHandler.deleteProduct(req, res)
-);
 
 // Route untuk Category
 app.get("/categories", (req, res) => categoryHandler.getAll(req, res));
