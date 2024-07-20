@@ -1,5 +1,5 @@
 const { Model, DataTypes } = require("sequelize");
-const sequelize = require("../auth_backend/config/postgres");
+const sequelize = require("../src/config/postgres");
 
 class Order extends Model {
   static associate(models) {
