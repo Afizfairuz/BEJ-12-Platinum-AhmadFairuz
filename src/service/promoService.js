@@ -12,6 +12,15 @@ class PromoService {
             return Common.responseToFE(false, 502, null, `${error.message}`);
         }
     }
+
+    async add(promo) {
+        try {
+            const newPromo = await this.repository.add(promo)
+            return Common.responseToFE(true, 200, newPromo, null);
+        } catch (error) {
+            return Common.responseToFE(false, 502, null, `${error.message}`);
+        }
+    }
 }
 
 module.exports = PromoService;
