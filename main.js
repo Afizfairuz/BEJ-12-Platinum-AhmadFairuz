@@ -24,6 +24,14 @@ const internalServerErrorHandler = (err, req, res, next) => {
 };
 app.use(internalServerErrorHandler);
 
+// Router Configuration
+const router = express.Router();
+const promoRouter = require('./src/router/promo')
+
+// Use router
+router.use('/promo', promoRouter)
+app.use('/api', router)
+
 // Inisialisasi repository
 const UserRepository = require("./src/repository/UserRepository");
 const ProductRepository = require("./src/repository/ProductRepository");
