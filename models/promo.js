@@ -1,25 +1,40 @@
-'use strict';
-const {
-  Model
-} = require('sequelize');
-module.exports = (sequelize, DataTypes) => {
-  class Promo extends Model {
-    /**
-     * Helper method for defining associations.
-     * This method is not a part of Sequelize lifecycle.
-     * The `models/index` file will call this method automatically.
-     */
-    static associate(models) {
-      // define association here
-    }
+const { Model, DataTypes } = require("sequelize");
+const sequelize = require("../src/config/postgres");
+
+class Promo extends Model {
+  static associate(models) {
+    // Define associations here if needed
   }
-  Promo.init({
-    id: DataTypes.INTEGER,
-    description: DataTypes.STRING,
-    promoImage: DataTypes.STRING
-  }, {
+}
+
+Promo.init(
+  {
+    id: {
+      allowNull: false,
+      autoIncrement: true,
+      primaryKey: true,
+      type: DataTypes.INTEGER
+    },
+    description: {
+      type: DataTypes.STRING
+    },
+    promoImage: {
+      type: DataTypes.STRING
+    },
+    createdAt: {
+      allowNull: false,
+      type: DataTypes.DATE
+    },
+    updatedAt: {
+      allowNull: false,
+      type: DataTypes.DATE
+    }
+  },
+  {
     sequelize,
-    modelName: 'Promo',
-  });
-  return Promo;
-};
+    modelName: "Promo",
+    tableName: "Promos"
+  }
+);
+
+module.exports = Promo
