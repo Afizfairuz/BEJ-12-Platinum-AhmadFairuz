@@ -14,9 +14,14 @@ class UserRepository {
     }
   }
 
-  async createUser(userData) {
+  async createUser(user) {
     try {
-      const newUser = await this.User.create(userData);
+      const newUser = await User.create({
+        name: user.name,
+        email: user.email,
+        password: user.password,
+      });
+
       return newUser;
     } catch (error) {
       throw new Error(`Failed to create user: ${error.message}`);
