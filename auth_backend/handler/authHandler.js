@@ -1,5 +1,3 @@
-// const AuthService = require("../service/authService");
-
 class AuthHandler {
   constructor(authService) {
     this.authService = authService;

@@ -28,7 +28,7 @@ const internalServerErrorHandler = (err, req, res, next) => {
 app.use(internalServerErrorHandler);
 
 // Inisialisasi repository
-const UserRepository = require("./auth_backend/repository/UserRepository");
+const UserRepository = require("./auth_backend/repository/userRepository");
 const ProductRepository = require("./auth_backend/repository/ProductRepository");
 const CategoryRepository = require("./auth_backend/repository/CategoryRepository");
 const OrderRepository = require("./auth_backend/repository/OrderRepository");
@@ -77,7 +77,6 @@ app.get(
   authMiddleware.checkUserIsJavid,
   userHandler.getAllUsers
 );
-// app.get("/users", (req, res) => userHandler.getAllUsers(req, res));
 app.post("/users", (req, res) => userHandler.createUser(req, res));
 app.get("/users/:email", (req, res) => userHandler.getUserByEmail(req, res));
 app.put("/users/:id", (req, res) => userHandler.updateUser(req, res));

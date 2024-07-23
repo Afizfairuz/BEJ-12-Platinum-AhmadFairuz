@@ -1,5 +1,6 @@
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const CONST = require("../constant/jwtconstant");
 
 class AuthService {
   constructor(userRepository) {
@@ -55,9 +56,9 @@ class AuthService {
         {
           email: user.email,
         },
-        jwtSecret,
+        CONST.JWT.SECRET,
         {
-          expiresIn: jwtExpireTime,
+          expiresIn: CONST.JWT.EXPIRE_TIME,
         }
       );
       return {

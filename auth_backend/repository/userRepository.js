@@ -5,6 +5,8 @@ class UserRepository {
     this.User = User;
   }
 
+  
+
   async findAll() {
     try {
       const userList = await this.User.findAll();
@@ -13,6 +15,7 @@ class UserRepository {
       throw new Error(`Failed to fetch users: ${error.message}`);
     }
   }
+
 
   async createUser(user) {
     try {
