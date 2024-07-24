@@ -1,8 +1,14 @@
-const UserService = require("../service/userService");
-
 class UserHandler {
-  constructor() {
-    this.userService = new UserService();
+  constructor(userService) {
+    this.userService = userService;
+
+    // binding
+    this.getAllUsers = this.getAllUsers.bind(this);
+    this.createUser = this.createUser.bind(this);
+    this.getUserByEmail = this.getUserByEmail.bind(this);
+    this.updateUser = this.updateUser.bind(this);
+    this.updateUserProfilePicture = this.updateUserProfilePicture.bind(this);
+    this.deleteUser = this.deleteUser.bind(this);
   }
 
   async getAllUsers(req, res) {
@@ -66,7 +72,10 @@ class UserHandler {
     try {
       const { id } = req.params;
       const { profilePicture } = req.body;
-      const updatedUser = await this.userService.updateUserProfilePicture(id, profilePicture);
+      const updatedUser = await this.userService.updateUserProfilePicture(
+        id,
+        profilePicture
+      );
       if (updatedUser) {
         res.json(updatedUser);
       } else {
