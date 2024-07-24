@@ -1,32 +1,30 @@
-const AuthService = require('../service/authService');
-
 class AuthHandler {
-  constructor() {
-    this.authService = new AuthService();
+  constructor(authService) {
+    this.authService = authService;
+
+    // binding
+    this.register = this.register.bind(this);
+    this.login = this.login.bind(this);
   }
 
   async register(req, res) {
-    try {
-      const { name, email, password } = req.body;
-      const newUser = await this.authService.register({
-        name,
-        email,
-        password,
-      });
-      res.status(201).json(newUser);
-    } catch (err) {
-      res.status(500).json({ message: err.message });
-    }
+    const payload = req.body;
+    const serviceRes = await this.authService.register(payload);
+
+    res.status(serviceRes.statusCode).send({
+      message: serviceRes.message,
+      created_user: serviceRes.createdUser,
+    });
   }
 
   async login(req, res) {
-    try {
-      const { email, password } = req.body;
-      const user = await this.authService.login(email, password);
-      res.json(user);
-    } catch (err) {
-      res.status(500).json({ message: err.message });
-    }
+    const payload = req.body;
+    const serviceRes = await this.authService.login(payload);
+
+    res.status(serviceRes.statusCode).send({
+      message: serviceRes.message,
+      token: serviceRes.token,
+    });
   }
 }
 

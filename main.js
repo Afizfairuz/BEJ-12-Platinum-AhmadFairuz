@@ -76,11 +76,18 @@ const itemHandler = new ItemHandler(itemService);
 const authHandler = new AuthHandler(authService);
 
 // Route untuk User
-app.get("/users", (req, res) => userHandler.getAllUsers(req, res));
+app.get(
+  "/users",
+  authMiddleware.authenticate,
+  authMiddleware.checkUserIsJavid,
+  userHandler.getAllUsers
+);
 app.post("/users", (req, res) => userHandler.createUser(req, res));
 app.get("/users/:email", (req, res) => userHandler.getUserByEmail(req, res));
 app.put("/users/:id", (req, res) => userHandler.updateUser(req, res));
-app.put("/users/:id/profilePicture", (req, res) => userHandler.updateUserProfilePicture(req, res));
+app.put("/users/:id/profilePicture", (req, res) =>
+  userHandler.updateUserProfilePicture(req, res)
+);
 app.delete("/users/:id", (req, res) => userHandler.deleteUser(req, res));
 
 // Route untuk Category
@@ -111,33 +118,16 @@ app.get("/images/binar.png", (req, res) => {
   res.sendFile(path.join(__dirname, "assets", "binar.png"));
 });
 
-//Endpoint login
-app.post('/auth/login', async (req, res) => {
-  try {
-    const { email, password } = req.body;
-    const user = await authService.login(email, password);
-    res.json(user);
-  } catch (error) {
-    res.status(400).json({ message: error.message});
-  }
-});
-
-//Endpoint Register
-app.post('/auth/register', async (req, res) => {
-  try {
-    const newUser = await authService.register(req.body);
-    res.json(newUser);
-  } catch (error) {
-    res.status(400).json({ message: error.message });
-  }
-});
+// Endpoint Register
+app.post("/auth/register", (req, res) => authHandler.register(req, res));
+// Endpoint login
+app.post("/auth/login", (req, res) => authHandler.login(req, res));
 
 //Swagger
-const swaggerUi = require('swagger-ui-express');
-const swaggerDocument = require('./swagger/swagger.json')
+const swaggerUi = require("swagger-ui-express");
+const swaggerDocument = require("./swagger/swagger.json");
 
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
-
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 // Menjalankan server
 app.listen(PORT, () => {

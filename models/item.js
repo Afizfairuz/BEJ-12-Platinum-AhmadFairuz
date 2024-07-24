@@ -3,7 +3,10 @@ const sequelize = require("../src/config/postgres");
 
 class Item extends Model {
   static associate(models) {
-    // Define associations here if needed
+    models.Item.belongsTo(models.Category, {
+      foreignKey: "categoryId",
+      as: "category",
+    });
   }
 }
 
@@ -14,6 +17,10 @@ Item.init(
       allowNull: false,
       autoIncrement: true,
       primaryKey: true,
+    },
+    categoryId: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
     },
     name: {
       type: DataTypes.STRING,

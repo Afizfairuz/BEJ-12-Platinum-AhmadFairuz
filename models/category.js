@@ -3,7 +3,7 @@ const sequelize = require("../src/config/postgres");
 
 class Category extends Model {
   static associate(models) {
-    // Define associations here if needed
+    models.Category.hasMany(models.Item, { foreignKey: "categoryId" });
   }
 }
 

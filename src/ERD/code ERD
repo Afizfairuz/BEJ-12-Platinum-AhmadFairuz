@@ -44,7 +44,8 @@ orderId integer
 }
 
 
+ref: items.categoryId > categories.id
+ref: payment.orderId > orders.id
 ref: orders.userId > users.id
 ref: orders.itemId > items.id
-ref: payment.orderId > orders.id
 ref: orders.promoId > promo.id
