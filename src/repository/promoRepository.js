@@ -13,6 +13,31 @@ class PromoRepository {
         });
         return newPromo;
     }
+
+    async getById(id) {
+        return await Promo.findOne({
+            where: { id: id }
+        })
+    }
+
+    async update(existingPromo, updatedPromo) {
+        var updateDescription = false
+        var updatePromoImage = false
+        if (updatedPromo.description) {
+            existingPromo.description = updatedPromo.description
+            updateDescription = true
+        }
+
+        if (updatedPromo.promoImage) {
+            existingPromo.promoImage = updatedPromo.promoImage
+            updatePromoImage = true
+        }
+
+        if (updateDescription || updatePromoImage) {
+            await existingPromo.save()
+        }
+        
+    }
 }
 
 module.exports = PromoRepository;

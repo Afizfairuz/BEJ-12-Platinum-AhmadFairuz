@@ -12,5 +12,6 @@ const router = express.Router();
 
 router.get('/promos', promoHandler.getAll);
 router.post('/add', promoHandler.add);
+router.get('/get-by-id', promoHandler.getById);
 
 module.exports = router;
