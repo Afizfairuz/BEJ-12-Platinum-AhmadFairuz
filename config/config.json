@@ -1,21 +1,21 @@
 {
   "development": {
     "username": "postgres",
-    "password": "171586",
+    "password": "afizfairuz87",
     "database": "auth_backend",
     "host": "127.0.0.1",
     "dialect": "postgres"
   },
   "test": {
     "username": "postgres",
-    "password": "171586",
+    "password": "afizfairuz87",
     "database": "auth_backend",
     "host": "127.0.0.1",
     "dialect": "postgres"
   },
   "production": {
     "username": "postgres",
-    "password": "171586",
+    "password": "afizfairuz87",
     "database": "auth_backend",
     "host": "127.0.0.1",
     "dialect": "postgres"
