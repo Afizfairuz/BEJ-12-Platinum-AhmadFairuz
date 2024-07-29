@@ -1,5 +1,5 @@
 const { Model, DataTypes } = require("sequelize");
-const sequelize = require("../src/config/postgres");
+const sequelize = require("../auth_backend/config/postgres");
 
 class Item extends Model {
   static associate(models) {

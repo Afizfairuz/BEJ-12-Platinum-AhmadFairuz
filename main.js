@@ -1,7 +1,7 @@
 const express = require("express");
 const path = require("path");
 const app = express();
-const PORT = 3883;
+const PORT = 8000;
 
 // Middleware untuk parsing request body
 app.use(express.json());
@@ -26,18 +26,18 @@ app.use(internalServerErrorHandler);
 
 // Router Configuration
 const router = express.Router();
-const promoRouter = require('./src/router/promo')
+const promoRouter = require('./auth_backend/router/promo')
 
 // Use router
 router.use('/promo', promoRouter)
 app.use('/api', router)
 
 // Inisialisasi repository
-const UserRepository = require("./src/repository/UserRepository");
-const ProductRepository = require("./src/repository/ProductRepository");
-const CategoryRepository = require("./src/repository/CategoryRepository");
-const OrderRepository = require("./src/repository/OrderRepository");
-const ItemRepository = require("./src/repository/ItemRepository");
+const UserRepository = require("./auth_backend/repository/userRepository");
+const ProductRepository = require("./auth_backend/repository/productRepository");
+const CategoryRepository = require("./auth_backend/repository/categoryRepository");
+const OrderRepository = require("./auth_backend/repository/OrderRepository");
+const ItemRepository = require("./auth_backend/repository/itemRepository");
 
 const userRepository = new UserRepository();
 const productRepository = new ProductRepository();
@@ -46,12 +46,12 @@ const orderRepository = new OrderRepository();
 const itemRepository = new ItemRepository();
 
 // Inisialisasi service
-const UserService = require("./src/service/userService");
-const ProductService = require("./src/service/ProductService");
-const CategoryService = require("./src/service/CategoryService");
-const OrderService = require("./src/service/OrderService");
-const ItemService = require("./src/service/ItemService");
-const AuthService = require("./src/service/authService");
+const UserService = require("./auth_backend/service/userService");
+const ProductService = require("./auth_backend/service/productService");
+const CategoryService = require("./auth_backend/service/categoryService");
+const OrderService = require("./auth_backend/service/orderService");
+const ItemService = require("./auth_backend/service/itemService");
+const AuthService = require("./auth_backend/service/authService");
 
 const userService = new UserService(userRepository);
 const productService = new ProductService(productRepository, userRepository);
@@ -61,12 +61,12 @@ const itemService = new ItemService(itemRepository);
 const authService = new AuthService(userRepository);
 
 // Inisialisasi handler
-const UserHandler = require("./src/handler/userHandler");
-const ProductHandler = require("./src/handler/ProductHandler");
-const CategoryHandler = require("./src/handler/CategoryHandler");
-const OrderHandler = require("./src/handler/OrderHandler");
-const ItemHandler = require("./src/handler/ItemHandler");
-const AuthHandler = require("./src/handler/authHandler");
+const UserHandler = require("./auth_backend/handler/userHandler");
+const ProductHandler = require("./auth_backend/handler/productHandler");
+const CategoryHandler = require("./auth_backend/handler/categoryHandler");
+const OrderHandler = require("./auth_backend/handler/orderHandler");
+const ItemHandler = require("./auth_backend/handler/itemHandler");
+const AuthHandler = require("./auth_backend/handler/authHandler");
 
 const userHandler = new UserHandler(userService);
 const productHandler = new ProductHandler(productService);
@@ -75,11 +75,13 @@ const orderHandler = new OrderHandler(orderService);
 const itemHandler = new ItemHandler(itemService);
 const authHandler = new AuthHandler(authService);
 
+const authMiddleware = require('./auth_backend/middleware/auth')
+
 // Route untuk User
 app.get(
   "/users",
   authMiddleware.authenticate,
-  authMiddleware.checkUserIsJavid,
+  authMiddleware.checkUserIsAdmin,
   userHandler.getAllUsers
 );
 app.post("/users", (req, res) => userHandler.createUser(req, res));
