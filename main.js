@@ -38,12 +38,14 @@ const ProductRepository = require("./auth_backend/repository/productRepository")
 const CategoryRepository = require("./auth_backend/repository/categoryRepository");
 const OrderRepository = require("./auth_backend/repository/OrderRepository");
 const ItemRepository = require("./auth_backend/repository/itemRepository");
+const PaymentRepository = require("./auth_backend/repository/paymentRepository");
 
 const userRepository = new UserRepository();
 const productRepository = new ProductRepository();
 const categoryRepository = new CategoryRepository();
 const orderRepository = new OrderRepository();
 const itemRepository = new ItemRepository();
+const paymentRepository = new PaymentRepository();
 
 // Inisialisasi service
 const UserService = require("./auth_backend/service/userService");
@@ -51,6 +53,7 @@ const ProductService = require("./auth_backend/service/productService");
 const CategoryService = require("./auth_backend/service/categoryService");
 const OrderService = require("./auth_backend/service/orderService");
 const ItemService = require("./auth_backend/service/itemService");
+const PaymentService = require("./auth_backend/service/paymentService");
 const AuthService = require("./auth_backend/service/authService");
 
 const userService = new UserService(userRepository);
@@ -58,6 +61,7 @@ const productService = new ProductService(productRepository, userRepository);
 const categoryService = new CategoryService(categoryRepository);
 const orderService = new OrderService(orderRepository);
 const itemService = new ItemService(itemRepository);
+const paymentService = new PaymentService(paymentRepository);
 const authService = new AuthService(userRepository);
 
 // Inisialisasi handler
@@ -66,6 +70,7 @@ const ProductHandler = require("./auth_backend/handler/productHandler");
 const CategoryHandler = require("./auth_backend/handler/categoryHandler");
 const OrderHandler = require("./auth_backend/handler/orderHandler");
 const ItemHandler = require("./auth_backend/handler/itemHandler");
+const PaymentHandler = require("./auth_backend/handler/paymentHandler");
 const AuthHandler = require("./auth_backend/handler/authHandler");
 
 const userHandler = new UserHandler(userService);
@@ -73,6 +78,7 @@ const productHandler = new ProductHandler(productService);
 const categoryHandler = new CategoryHandler(categoryService);
 const orderHandler = new OrderHandler(orderService);
 const itemHandler = new ItemHandler(itemService);
+const paymentHandler = new PaymentHandler(paymentService);
 const authHandler = new AuthHandler(authService);
 
 const authMiddleware = require('./auth_backend/middleware/auth')
@@ -100,6 +106,13 @@ app.put("/categories/:id", (req, res) => categoryHandler.updateById(req, res));
 app.delete("/categories/:id", (req, res) =>
   categoryHandler.deleteById(req, res)
 );
+
+// Route untuk Payment
+app.get("/payments", (req, res) => paymentHandler.getAll(req, res));
+app.get("/payments/:id", (req, res) => paymentHandler.getById(req, res));
+app.post("/payments", (req, res) => paymentHandler.create(req, res));
+app.put("/payments/:id", (req, res) => paymentHandler.updateById(req, res));
+app.delete("/payments/:id", (req, res) => paymentHandler.deleteById(req, res));
 
 // Route untuk Order
 app.get("/orders", (req, res) => orderHandler.getAll(req, res));

@@ -3,7 +3,12 @@ const sequelize = require("../auth_backend/config/postgres");
 
 class Order extends Model {
   static associate(models) {
-    // Define associations here if needed
+    models.Order.hasMany(models.Payment, { foreignKey: "orderId" });
+    models.Order.belongsTo(models.User, { foreignKey: "userId", as: "user" });
+    models.Order.belongsTo(models.Product, {
+      foreignKey: "productId",
+      as: "product",
+    });
   }
 }
 
