@@ -3,9 +3,6 @@ const path = require("path");
 const app = express();
 const PORT = 8000;
 
-// import middleware untuk auth
-const authMiddleware = require("./auth_backend/middleware/auth");
-
 // Middleware untuk parsing request body
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -27,12 +24,20 @@ const internalServerErrorHandler = (err, req, res, next) => {
 };
 app.use(internalServerErrorHandler);
 
+// Router Configuration
+const router = express.Router();
+const promoRouter = require('./auth_backend/router/promo')
+
+// Use router
+router.use('/promo', promoRouter)
+app.use('/api', router)
+
 // Inisialisasi repository
 const UserRepository = require("./auth_backend/repository/userRepository");
-const ProductRepository = require("./auth_backend/repository/ProductRepository");
-const CategoryRepository = require("./auth_backend/repository/CategoryRepository");
+const ProductRepository = require("./auth_backend/repository/productRepository");
+const CategoryRepository = require("./auth_backend/repository/categoryRepository");
 const OrderRepository = require("./auth_backend/repository/OrderRepository");
-const ItemRepository = require("./auth_backend/repository/ItemRepository");
+const ItemRepository = require("./auth_backend/repository/itemRepository");
 const PaymentRepository = require("./auth_backend/repository/paymentRepository");
 
 const userRepository = new UserRepository();
@@ -44,10 +49,10 @@ const paymentRepository = new PaymentRepository();
 
 // Inisialisasi service
 const UserService = require("./auth_backend/service/userService");
-const ProductService = require("./auth_backend/service/ProductService");
-const CategoryService = require("./auth_backend/service/CategoryService");
-const OrderService = require("./auth_backend/service/OrderService");
-const ItemService = require("./auth_backend/service/ItemService");
+const ProductService = require("./auth_backend/service/productService");
+const CategoryService = require("./auth_backend/service/categoryService");
+const OrderService = require("./auth_backend/service/orderService");
+const ItemService = require("./auth_backend/service/itemService");
 const PaymentService = require("./auth_backend/service/paymentService");
 const AuthService = require("./auth_backend/service/authService");
 
@@ -61,10 +66,10 @@ const authService = new AuthService(userRepository);
 
 // Inisialisasi handler
 const UserHandler = require("./auth_backend/handler/userHandler");
-const ProductHandler = require("./auth_backend/handler/ProductHandler");
-const CategoryHandler = require("./auth_backend/handler/CategoryHandler");
-const OrderHandler = require("./auth_backend/handler/OrderHandler");
-const ItemHandler = require("./auth_backend/handler/ItemHandler");
+const ProductHandler = require("./auth_backend/handler/productHandler");
+const CategoryHandler = require("./auth_backend/handler/categoryHandler");
+const OrderHandler = require("./auth_backend/handler/orderHandler");
+const ItemHandler = require("./auth_backend/handler/itemHandler");
 const PaymentHandler = require("./auth_backend/handler/paymentHandler");
 const AuthHandler = require("./auth_backend/handler/authHandler");
 
@@ -76,11 +81,13 @@ const itemHandler = new ItemHandler(itemService);
 const paymentHandler = new PaymentHandler(paymentService);
 const authHandler = new AuthHandler(authService);
 
+const authMiddleware = require('./auth_backend/middleware/auth')
+
 // Route untuk User
 app.get(
   "/users",
   authMiddleware.authenticate,
-  authMiddleware.checkUserIsJavid,
+  authMiddleware.checkUserIsAdmin,
   userHandler.getAllUsers
 );
 app.post("/users", (req, res) => userHandler.createUser(req, res));
@@ -90,15 +97,6 @@ app.put("/users/:id/profilePicture", (req, res) =>
   userHandler.updateUserProfilePicture(req, res)
 );
 app.delete("/users/:id", (req, res) => userHandler.deleteUser(req, res));
-
-// Route untuk Product
-app.get("/products", (req, res) => productHandler.getAllProducts(req, res));
-app.post("/products", (req, res) => productHandler.createProduct(req, res));
-app.get("/products/:id", (req, res) => productHandler.getProductById(req, res));
-app.put("/products/:id", (req, res) => productHandler.updateProduct(req, res));
-app.delete("/products/:id", (req, res) =>
-  productHandler.deleteProduct(req, res)
-);
 
 // Route untuk Category
 app.get("/categories", (req, res) => categoryHandler.getAll(req, res));
