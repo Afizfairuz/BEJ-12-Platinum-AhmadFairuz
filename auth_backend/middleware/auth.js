@@ -25,7 +25,7 @@ class Auth {
     next();
   }
 
-  static checkUserIsJavid(req, res, next) {
+  static checkUserIsAdmin(req, res, next) {
     // TODO: pastikan user yang masuk payloadnya adalah javid@gmail.com
     if (req.userEmail === "admin@gmail.com") {
       next();

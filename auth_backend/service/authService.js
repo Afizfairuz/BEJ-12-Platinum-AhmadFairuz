@@ -48,10 +48,7 @@ class AuthService {
     const userValid = bcrypt.compareSync(password, user.password);
 
     if (userValid) {
-      // generate jwt token
-      const jwtSecret = "SECRET";
-      const jwtExpireTime = "24h";
-
+      
       const token = jwt.sign(
         {
           email: user.email,
@@ -74,6 +71,30 @@ class AuthService {
       token: null,
     };
   }
+
+async logout (){
+  const token = jwt.sign(
+    {
+      email: user.email,
+    },
+    CONST.JWT.SECRET,
+    {
+      expiresIn: CONST.JWT.EXPIRE_TIME_LOGOUT
+    }
+  );
+  return {
+    statusCode: 200,
+    message: "berhasil logout",
+    token: token,
+  };
+}
+
+// return {
+//   statusCode: 400,
+//   message: "Login gagal",
+//   token: null,
+// };
+// }
 }
 
 module.exports = AuthService;

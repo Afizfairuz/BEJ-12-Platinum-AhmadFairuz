@@ -1,8 +1,8 @@
 {
   "openapi": "3.0.3",
   "info": {
-    "title": "API Documentation",
-    "description": "Documentation for User Authentication and Operations",
+    "title": "Bingle shop",
+    "description": "api documentation",
     "version": "1.0.0"
   },
   "paths": {

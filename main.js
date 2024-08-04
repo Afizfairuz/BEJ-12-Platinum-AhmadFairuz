@@ -74,7 +74,7 @@ const authHandler = new AuthHandler(authService);
 app.get(
   "/users",
   authMiddleware.authenticate,
-  authMiddleware.checkUserIsJavid,
+  authMiddleware.checkUserIsAdmin,
   userHandler.getAllUsers
 );
 app.post("/users", (req, res) => userHandler.createUser(req, res));
