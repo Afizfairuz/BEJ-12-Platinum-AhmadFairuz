@@ -2,6 +2,46 @@ const express = require("express");
 const path = require("path");
 const app = express();
 const PORT = 8000;
+const http = require("http");
+const socketIo = require("socket.io");
+
+const server = http.createServer(app);
+const io = socketIo(server);
+
+// Routing untuk file statis
+app.use(express.static("publicsocket"));  
+
+// Namespace untuk admin
+const adminNamespace = io.of('/admin');
+adminNamespace.on('connection', (socket) => {
+  console.log('Admin terhubung');
+
+  socket.on('message', (data) => {
+    console.log('Pesan dari admin:', data);
+    io.of('/user').emit('message', data); 
+  });
+
+  socket.on('disconnect', () => {
+    console.log('Admin terputus');
+  });
+});
+
+
+// Namespace untuk user
+const userNamespace = io.of('/user');
+userNamespace.on('connection', (socket) => {
+  console.log('User terhubung');
+
+  socket.on('message', (data) => {
+    console.log('Pesan dari user:', data);
+    io.of('/admin').emit('message', data); // Mengirim pesan ke namespace /admin
+  });
+
+  socket.on('disconnect', () => {
+    console.log('User terputus');
+  });
+});
+
 
 // Middleware untuk parsing request body
 app.use(express.json());
