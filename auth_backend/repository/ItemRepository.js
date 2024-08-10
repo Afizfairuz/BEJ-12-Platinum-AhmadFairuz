@@ -13,6 +13,14 @@ class ItemRepository {
     return await Item.create(itemData);
   }
 
+  async deleteByName(name) {
+    await Item.destroy({
+      where: {
+        name: name,
+      },
+    });
+  }
+
   async updateItem(id, itemData) {
     const item = await Item.findByPk(id);
     if (item) {

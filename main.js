@@ -2,57 +2,18 @@ const express = require("express");
 const path = require("path");
 const app = express();
 const PORT = 8000;
-const http = require("http");
-const socketIo = require("socket.io");
-
-const server = http.createServer(app);
-const io = socketIo(server);
-
-// Routing untuk file statis
-app.use(express.static("publicsocket"));  
-
-// Namespace untuk admin
-const adminNamespace = io.of('/admin');
-adminNamespace.on('connection', (socket) => {
-  console.log('Admin terhubung');
-
-  socket.on('message', (data) => {
-    console.log('Pesan dari admin:', data);
-    io.of('/user').emit('message', data); 
-  });
-
-  socket.on('disconnect', () => {
-    console.log('Admin terputus');
-  });
-});
-
-
-// Namespace untuk user
-const userNamespace = io.of('/user');
-userNamespace.on('connection', (socket) => {
-  console.log('User terhubung');
-
-  socket.on('message', (data) => {
-    console.log('Pesan dari user:', data);
-    io.of('/admin').emit('message', data); // Mengirim pesan ke namespace /admin
-  });
-
-  socket.on('disconnect', () => {
-    console.log('User terputus');
-  });
-});
-
 
 // Middleware untuk parsing request body
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(morgan("combined"));
 
 // Middleware untuk logging
-const logger = (req, res, next) => {
-  console.log(`${req.method} ${req.url}`);
-  next();
-};
-app.use(logger);
+// const logger = (req, res, next) => {
+//   console.log(`${req.method} ${req.url}`);
+//   next();
+// };
+// app.use(logger);
 
 // Middleware untuk menangani error internal server
 const internalServerErrorHandler = (err, req, res, next) => {
@@ -66,11 +27,11 @@ app.use(internalServerErrorHandler);
 
 // Router Configuration
 const router = express.Router();
-const promoRouter = require('./auth_backend/router/promo')
+const promoRouter = require("./auth_backend/router/promo");
 
 // Use router
-router.use('/promo', promoRouter)
-app.use('/api', router)
+router.use("/promo", promoRouter);
+app.use("/api", router);
 
 // Inisialisasi repository
 const UserRepository = require("./auth_backend/repository/userRepository");
@@ -121,7 +82,7 @@ const itemHandler = new ItemHandler(itemService);
 const paymentHandler = new PaymentHandler(paymentService);
 const authHandler = new AuthHandler(authService);
 
-const authMiddleware = require('./auth_backend/middleware/auth')
+const authMiddleware = require("./auth_backend/middleware/auth");
 
 // Route untuk User
 app.get(
@@ -177,6 +138,34 @@ app.get("/images/binar.png", (req, res) => {
 app.post("/auth/register", (req, res) => authHandler.register(req, res));
 // Endpoint login
 app.post("/auth/login", (req, res) => authHandler.login(req, res));
+
+// Endpoint Upload Storage & Cloudinary
+app.post("/files/storage/upload", upload.single("image"), (req, res) => {
+  res.send("success");
+});
+
+app.post(
+  "/files/cloudinary/upload",
+  uploadCloudinary.single("image"),
+  async (req, res) => {
+    // TODO: upload to cloudinary storage
+    try {
+      const fileBuffer = req.file?.buffer.toString("base64");
+      const fileString = `data:${req.file?.mimetype};base64,${fileBuffer}`;
+
+      const uploadedFile = await cloudinary.uploader.upload(fileString);
+
+      return res.status(201).send({
+        message: "succes",
+        image: uploadedFile.secure_url,
+      });
+    } catch (error) {
+      return res.status(400).send({
+        message: error,
+      });
+    }
+  }
+);
 
 //Swagger
 const swaggerUi = require("swagger-ui-express");
