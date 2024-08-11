@@ -5,8 +5,6 @@ class UserRepository {
     this.User = User;
   }
 
-  
-
   async findAll() {
     try {
       const userList = await this.User.findAll();
@@ -16,10 +14,9 @@ class UserRepository {
     }
   }
 
-
   async createUser(user) {
     try {
-      const newUser = await User.create({
+      const newUser = await this.User.create({
         name: user.name,
         email: user.email,
         password: user.password,
@@ -73,6 +70,37 @@ class UserRepository {
       return deletedUser;
     } catch (error) {
       throw new Error(`Failed to delete user: ${error.message}`);
+    }
+  }
+
+  async createToken(id, user) {
+    try {
+      const newData = { token: user.token, session: user.session };
+
+      const newToken = await this.User.update(newData, { where: { id } });
+      return newToken;
+    } catch (error) {
+      throw new Error(`Failed to create token and session: ${error.message}`);
+    }
+  }
+
+  async getUserById(id) {
+    try {
+      const userId = await this.User.findOne({ where: { id } });
+      return userId;
+    } catch (error) {
+      throw new Error(`Failed to get token and session: ${error.message}`);
+    }
+  }
+
+  async deleteToken(id) {
+    try {
+      const data = { token: "", session: "" };
+
+      const deletedToken = await this.User.update(data, { where: { id } });
+      return deletedToken;
+    } catch (error) {
+      throw new Error(`Failed to delete token and session: ${error.message}`);
     }
   }
 }

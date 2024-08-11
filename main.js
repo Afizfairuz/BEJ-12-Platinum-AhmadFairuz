@@ -1,5 +1,7 @@
 const express = require("express");
 const path = require("path");
+const session = require("express-session");
+const redisClient = require("./auth_backend/config/redis");
 const app = express();
 const PORT = 8000;
 
@@ -26,6 +28,16 @@ const internalServerErrorHandler = (err, req, res, next) => {
   });
 };
 app.use(internalServerErrorHandler);
+
+// session
+app.use(
+  session({
+    secret: "secret",
+    resave: false,
+    saveUninitialized: true,
+    cookie: { secure: false, maxAge: 60000 },
+  })
+);
 
 // Inisialisasi repository
 const UserRepository = require("./auth_backend/repository/userRepository");
@@ -122,10 +134,54 @@ app.get("/images/binar.png", (req, res) => {
   res.sendFile(path.join(__dirname, "assets", "binar.png"));
 });
 
-// Endpoint Register
+// route untuk auth
 app.post("/auth/register", (req, res) => authHandler.register(req, res));
-// Endpoint login
 app.post("/auth/login", (req, res) => authHandler.login(req, res));
+app.patch("/auth/token/:id", (req, res) => authHandler.createToken(req, res));
+app.get("/auth/token/:id", (req, res) => authHandler.getUserById(req, res));
+app.patch("/auth/logout/:id", (req, res) => authHandler.logout(req, res));
+
+// Redis
+app.post("/auth/redis", async (req, res) => {
+  const token = req.body.token;
+  const session = req.body.session;
+  const userId = req.body.userId;
+  const dataToSave = {
+    token: token,
+    session: session,
+    userId: userId,
+  };
+  await redisClient.connect();
+  await redisClient.set("user-", JSON.stringify(dataToSave));
+  await redisClient.disconnect();
+
+  res.send("success");
+});
+app.get("/auth/redis/id", async (req, res) => {
+const userId = req.params.userId;
+
+  await redisClient.connect();
+  const data = await redisClient.get(userId);
+  await redisClient.disconnect();
+
+  res.send({
+    message: "success",
+    data: data,
+  });
+});
+
+app.delete("/auth/redis/logout", async (req, res) => {
+  const userId = req.params.userId;
+
+  await redisClient.connect();
+  const data = await redisClient.delete(userId);
+  await redisClient.disconnect();
+
+  res.send({
+    message: "success to delete",
+    data: data,
+  });
+});
 
 //Swagger
 const swaggerUi = require("swagger-ui-express");
