@@ -8,6 +8,7 @@ module.exports = {
       "Items",
       [
         {
+          categoryId: 1,
           name: "Laptop",
           description: "laptop high performance",
           price: 1200.0,
@@ -16,6 +17,7 @@ module.exports = {
           updatedAt: now,
         },
         {
+          categoryId: 1,
           name: "Smartphone",
           description: "model with advanced features",
           price: 800.0,
@@ -24,9 +26,9 @@ module.exports = {
           updatedAt: now,
         },
         {
+          categoryId: 1,
           name: "Headphones",
-          description:
-            "audio experience.",
+          description: "audio experience.",
           price: 150.0,
           stock: 30,
           createdAt: now,

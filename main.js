@@ -5,19 +5,17 @@ const redisClient = require("./auth_backend/config/redis");
 const app = express();
 const PORT = 8000;
 
-// import middleware untuk auth
-const authMiddleware = require("./auth_backend/middleware/auth");
-
 // Middleware untuk parsing request body
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(morgan("combined"));
 
 // Middleware untuk logging
-const logger = (req, res, next) => {
-  console.log(`${req.method} ${req.url}`);
-  next();
-};
-app.use(logger);
+// const logger = (req, res, next) => {
+//   console.log(`${req.method} ${req.url}`);
+//   next();
+// };
+// app.use(logger);
 
 // Middleware untuk menangani error internal server
 const internalServerErrorHandler = (err, req, res, next) => {
@@ -38,26 +36,36 @@ app.use(
     cookie: { secure: false, maxAge: 60000 },
   })
 );
+// Router Configuration
+const router = express.Router();
+const promoRouter = require("./auth_backend/router/promo");
+
+// Use router
+router.use("/promo", promoRouter);
+app.use("/api", router);
 
 // Inisialisasi repository
 const UserRepository = require("./auth_backend/repository/userRepository");
-const ProductRepository = require("./auth_backend/repository/ProductRepository");
-const CategoryRepository = require("./auth_backend/repository/CategoryRepository");
+const ProductRepository = require("./auth_backend/repository/productRepository");
+const CategoryRepository = require("./auth_backend/repository/categoryRepository");
 const OrderRepository = require("./auth_backend/repository/OrderRepository");
-const ItemRepository = require("./auth_backend/repository/ItemRepository");
+const ItemRepository = require("./auth_backend/repository/itemRepository");
+const PaymentRepository = require("./auth_backend/repository/paymentRepository");
 
 const userRepository = new UserRepository();
 const productRepository = new ProductRepository();
 const categoryRepository = new CategoryRepository();
 const orderRepository = new OrderRepository();
 const itemRepository = new ItemRepository();
+const paymentRepository = new PaymentRepository();
 
 // Inisialisasi service
 const UserService = require("./auth_backend/service/userService");
-const ProductService = require("./auth_backend/service/ProductService");
-const CategoryService = require("./auth_backend/service/CategoryService");
-const OrderService = require("./auth_backend/service/OrderService");
-const ItemService = require("./auth_backend/service/ItemService");
+const ProductService = require("./auth_backend/service/productService");
+const CategoryService = require("./auth_backend/service/categoryService");
+const OrderService = require("./auth_backend/service/orderService");
+const ItemService = require("./auth_backend/service/itemService");
+const PaymentService = require("./auth_backend/service/paymentService");
 const AuthService = require("./auth_backend/service/authService");
 
 const userService = new UserService(userRepository);
@@ -65,14 +73,16 @@ const productService = new ProductService(productRepository, userRepository);
 const categoryService = new CategoryService(categoryRepository);
 const orderService = new OrderService(orderRepository);
 const itemService = new ItemService(itemRepository);
+const paymentService = new PaymentService(paymentRepository);
 const authService = new AuthService(userRepository);
 
 // Inisialisasi handler
 const UserHandler = require("./auth_backend/handler/userHandler");
-const ProductHandler = require("./auth_backend/handler/ProductHandler");
-const CategoryHandler = require("./auth_backend/handler/CategoryHandler");
-const OrderHandler = require("./auth_backend/handler/OrderHandler");
-const ItemHandler = require("./auth_backend/handler/ItemHandler");
+const ProductHandler = require("./auth_backend/handler/productHandler");
+const CategoryHandler = require("./auth_backend/handler/categoryHandler");
+const OrderHandler = require("./auth_backend/handler/orderHandler");
+const ItemHandler = require("./auth_backend/handler/itemHandler");
+const PaymentHandler = require("./auth_backend/handler/paymentHandler");
 const AuthHandler = require("./auth_backend/handler/authHandler");
 
 const userHandler = new UserHandler(userService);
@@ -80,7 +90,10 @@ const productHandler = new ProductHandler(productService);
 const categoryHandler = new CategoryHandler(categoryService);
 const orderHandler = new OrderHandler(orderService);
 const itemHandler = new ItemHandler(itemService);
+const paymentHandler = new PaymentHandler(paymentService);
 const authHandler = new AuthHandler(authService);
+
+const authMiddleware = require("./auth_backend/middleware/auth");
 
 // Route untuk User
 app.get(
@@ -97,15 +110,6 @@ app.put("/users/:id/profilePicture", (req, res) =>
 );
 app.delete("/users/:id", (req, res) => userHandler.deleteUser(req, res));
 
-// Route untuk Product
-app.get("/products", (req, res) => productHandler.getAllProducts(req, res));
-app.post("/products", (req, res) => productHandler.createProduct(req, res));
-app.get("/products/:id", (req, res) => productHandler.getProductById(req, res));
-app.put("/products/:id", (req, res) => productHandler.updateProduct(req, res));
-app.delete("/products/:id", (req, res) =>
-  productHandler.deleteProduct(req, res)
-);
-
 // Route untuk Category
 app.get("/categories", (req, res) => categoryHandler.getAll(req, res));
 app.get("/categories/:id", (req, res) => categoryHandler.getById(req, res));
@@ -114,6 +118,13 @@ app.put("/categories/:id", (req, res) => categoryHandler.updateById(req, res));
 app.delete("/categories/:id", (req, res) =>
   categoryHandler.deleteById(req, res)
 );
+
+// Route untuk Payment
+app.get("/payments", (req, res) => paymentHandler.getAll(req, res));
+app.get("/payments/:id", (req, res) => paymentHandler.getById(req, res));
+app.post("/payments", (req, res) => paymentHandler.create(req, res));
+app.put("/payments/:id", (req, res) => paymentHandler.updateById(req, res));
+app.delete("/payments/:id", (req, res) => paymentHandler.deleteById(req, res));
 
 // Route untuk Order
 app.get("/orders", (req, res) => orderHandler.getAll(req, res));
@@ -157,7 +168,7 @@ app.post("/auth/redis", async (req, res) => {
 
   res.send("success");
 });
-app.get("/auth/redis/id", async (req, res) => {
+app.get("/auth/redis/", async (req, res) => {
 const userId = req.params.userId;
 
   await redisClient.connect();
@@ -183,6 +194,34 @@ app.delete("/auth/redis/logout", async (req, res) => {
   });
 });
 
+// Endpoint Upload Storage & Cloudinary
+app.post("/files/storage/upload", upload.single("image"), (req, res) => {
+  res.send("success");
+});
+
+app.post(
+  "/files/cloudinary/upload",
+  uploadCloudinary.single("image"),
+  async (req, res) => {
+    // TODO: upload to cloudinary storage
+    try {
+      const fileBuffer = req.file?.buffer.toString("base64");
+      const fileString = `data:${req.file?.mimetype};base64,${fileBuffer}`;
+
+      const uploadedFile = await cloudinary.uploader.upload(fileString);
+
+      return res.status(201).send({
+        message: "succes",
+        image: uploadedFile.secure_url,
+      });
+    } catch (error) {
+      return res.status(400).send({
+        message: error,
+      });
+    }
+  }
+);
+
 //Swagger
 const swaggerUi = require("swagger-ui-express");
 const swaggerDocument = require("./swagger/swagger.json");
@@ -193,3 +232,4 @@ app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 app.listen(PORT, () => {
   console.log(`Server berjalan pada http://localhost:${PORT}`);
 });
+    

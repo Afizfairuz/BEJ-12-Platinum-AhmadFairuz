@@ -8,7 +8,9 @@
   "paths": {
     "/auth/register": {
       "post": {
-        "tags": ["auth"],
+        "tags": [
+          "auth"
+        ],
         "summary": "Register a new user",
         "description": "Register a new user with name, email, and password",
         "requestBody": {
@@ -33,7 +35,11 @@
                     "example": "password123"
                   }
                 },
-                "required": ["name", "email", "password"]
+                "required": [
+                  "name",
+                  "email",
+                  "password"
+                ]
               }
             }
           }
@@ -94,7 +100,9 @@
     },
     "/auth/login": {
       "post": {
-        "tags": ["auth"],
+        "tags": [
+          "auth"
+        ],
         "summary": "Log in as a user",
         "description": "Log in with email and password to obtain access token",
         "requestBody": {
@@ -115,7 +123,10 @@
                     "example": "password123"
                   }
                 },
-                "required": ["email", "password"]
+                "required": [
+                  "email",
+                  "password"
+                ]
               }
             }
           }
@@ -178,7 +189,9 @@
       "get": {
         "summary": "Get all users",
         "operationId": "getAllUsers",
-        "tags": ["Users"],
+        "tags": [
+          "Users"
+        ],
         "responses": {
           "200": {
             "description": "List of users",
@@ -208,7 +221,9 @@
       "post": {
         "summary": "Create a new user",
         "operationId": "createUser",
-        "tags": ["Users"],
+        "tags": [
+          "Users"
+        ],
         "requestBody": {
           "required": true,
           "content": {
@@ -247,7 +262,9 @@
       "put": {
         "summary": "Update user by ID",
         "operationId": "updateUser",
-        "tags": ["Users"],
+        "tags": [
+          "Users"
+        ],
         "parameters": [
           {
             "name": "id",
@@ -305,7 +322,9 @@
       "delete": {
         "summary": "Delete user by ID",
         "operationId": "deleteUser",
-        "tags": ["Users"],
+        "tags": [
+          "Users"
+        ],
         "parameters": [
           {
             "name": "id",
@@ -348,7 +367,9 @@
       "get": {
         "summary": "Get user by email",
         "operationId": "getUserByEmail",
-        "tags": ["Users"],
+        "tags": [
+          "Users"
+        ],
         "parameters": [
           {
             "name": "email",
@@ -373,6 +394,1009 @@
           },
           "404": {
             "description": "User not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/users/{id}/profilePicture": {
+      "put": {
+        "summary": "Update User Profile Picture",
+        "description": "Update the profile picture of a user",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "ID of the user to update",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Profile picture URL to update",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "profilePicture": {
+                    "type": "string",
+                    "format": "url",
+                    "example": "https://example.com/path/to/profile-picture.jpg"
+                  }
+                },
+                "required": [
+                  "profilePicture"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Profile picture updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    },
+                    "profilePicture": {
+                      "type": "string",
+                      "format": "url"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "User not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "User not found"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Internal Server Error"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/items": {
+      "get": {
+        "summary": "Get all items",
+        "operationId": "getAllItems",
+        "tags": [
+          "Items"
+        ],
+        "responses": {
+          "200": {
+            "description": "List of items",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Item"
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Create a new item",
+        "operationId": "createItem",
+        "tags": [
+          "Items"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NewItem"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Item created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Item"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/items/{id}": {
+      "get": {
+        "summary": "Get item by ID",
+        "operationId": "getItem",
+        "tags": [
+          "Items"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Get item by id successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Item"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Item not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "summary": "Update item by ID",
+        "operationId": "updateItem",
+        "tags": [
+          "Items"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateItem"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Item updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Item"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Item not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete item by ID",
+        "operationId": "deleteItem",
+        "tags": [
+          "Items"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Item deleted successfully"
+          },
+          "404": {
+            "description": "Item not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/categories": {
+      "get": {
+        "summary": "Get all categories",
+        "operationId": "getAllCategories",
+        "tags": [
+          "Categories"
+        ],
+        "responses": {
+          "200": {
+            "description": "List of categories",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Category"
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Create a new category",
+        "operationId": "createCategory",
+        "tags": [
+          "Categories"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NewCategory"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Category created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Category"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/categories/{id}": {
+      "get": {
+        "summary": "Get category by ID",
+        "operationId": "getCategory",
+        "tags": [
+          "Categories"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Get category by id successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Category"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Category not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "summary": "Update category by ID",
+        "operationId": "updateCategory",
+        "tags": [
+          "Categories"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateCategory"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Category updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Category"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Category not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete category by ID",
+        "operationId": "deleteCategory",
+        "tags": [
+          "Categories"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Category deleted successfully"
+          },
+          "404": {
+            "description": "Category not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/payments": {
+      "get": {
+        "summary": "Get all payments",
+        "operationId": "getAllPayments",
+        "tags": [
+          "Payments"
+        ],
+        "responses": {
+          "200": {
+            "description": "List of items",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Payment"
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Create a new payment",
+        "operationId": "createPayment",
+        "tags": [
+          "Payments"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NewPayment"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Payment created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Payment"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/payments/{id}": {
+      "get": {
+        "summary": "Get payment by ID",
+        "operationId": "getPayment",
+        "tags": [
+          "Payments"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Get payment by id successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Payment"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Payment not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "summary": "Update payment by ID",
+        "operationId": "updatePayment",
+        "tags": [
+          "Payments"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdatePayment"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Payment updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Payment"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Payment not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete payment by ID",
+        "operationId": "deletePayment",
+        "tags": [
+          "Payments"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Payment deleted successfully"
+          },
+          "404": {
+            "description": "Payment not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/orders": {
+      "get": {
+        "summary": "Get all orders",
+        "operationId": "getAllOrders",
+        "tags": [
+          "Orders"
+        ],
+        "responses": {
+          "200": {
+            "description": "List of orders",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Order"
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Create a new order",
+        "operationId": "createOrder",
+        "tags": [
+          "Orders"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NewOrder"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Order created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Order"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/orders/{id}": {
+      "get": {
+        "summary": "Get order by ID",
+        "operationId": "getOrder",
+        "tags": [
+          "Orders"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Get order by id successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Order"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Order not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "summary": "Update order by ID",
+        "operationId": "updateOrder",
+        "tags": [
+          "Orders"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateOrder"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Order updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Order"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Order not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete order by ID",
+        "operationId": "deleteOrder",
+        "tags": [
+          "Orders"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Order deleted successfully"
+          },
+          "404": {
+            "description": "Order not found",
             "content": {
               "application/json": {
                 "schema": {
@@ -443,7 +1467,11 @@
             "example": "password123"
           }
         },
-        "required": ["name", "email", "password"]
+        "required": [
+          "name",
+          "email",
+          "password"
+        ]
       },
       "UpdateUser": {
         "type": "object",
@@ -464,6 +1492,299 @@
         "properties": {
           "message": {
             "type": "string"
+          }
+        }
+      },
+      "Item": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "example": 1
+          },
+          "categoryId": {
+            "type": "integer",
+            "example": 1
+          },
+          "name": {
+            "type": "string",
+            "example": "Laptop"
+          },
+          "description": {
+            "type": "string",
+            "example": "laptop high performance"
+          },
+          "price": {
+            "type": "integer",
+            "example": 1200
+          },
+          "stock": {
+            "type": "integer",
+            "example": 10
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2024-07-12T12:00:00Z"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2024-07-12T12:00:00Z"
+          }
+        }
+      },
+      "NewItem": {
+        "type": "object",
+        "properties": {
+          "categoryId": {
+            "type": "integer",
+            "example": 1
+          },
+          "name": {
+            "type": "string",
+            "example": "Laptop"
+          },
+          "description": {
+            "type": "string",
+            "example": "laptop high performance"
+          },
+          "price": {
+            "type": "integer",
+            "example": 1200
+          },
+          "stock": {
+            "type": "integer",
+            "example": 10
+          }
+        },
+        "required": [
+          "categoryId",
+          "name",
+          "description",
+          "price",
+          "stock"
+        ]
+      },
+      "UpdateItem": {
+        "type": "object",
+        "properties": {
+          "categoryId": {
+            "type": "integer",
+            "example": 2
+          },
+          "name": {
+            "type": "string",
+            "example": "Tablet"
+          },
+          "description": {
+            "type": "string",
+            "example": "Good tablet for us"
+          },
+          "price": {
+            "type": "integer",
+            "example": 1800
+          },
+          "stock": {
+            "type": "integer",
+            "example": 12
+          }
+        }
+      },
+      "Category": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "example": 1
+          },
+          "name": {
+            "type": "string",
+            "example": "Electronics"
+          },
+          "description": {
+            "type": "string",
+            "example": "Category for electronic"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2024-07-12T12:00:00Z"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2024-07-12T12:00:00Z"
+          }
+        }
+      },
+      "NewCategory": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "example": "Electronics"
+          },
+          "description": {
+            "type": "string",
+            "example": "Category for electronic"
+          }
+        },
+        "required": [
+          "name",
+          "description"
+        ]
+      },
+      "UpdateCategory": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "example": "Furniture"
+          },
+          "description": {
+            "type": "string",
+            "example": "Good furniture for us"
+          }
+        }
+      },
+      "Payment": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "example": 1
+          },
+          "method": {
+            "type": "string",
+            "example": "Bank Debit"
+          },
+          "orderId": {
+            "type": "integer",
+            "example": 1
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2024-07-12T12:00:00Z"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2024-07-12T12:00:00Z"
+          }
+        }
+      },
+      "NewPayment": {
+        "type": "object",
+        "properties": {
+          "method": {
+            "type": "string",
+            "example": "Bank Debit"
+          },
+          "orderId": {
+            "type": "integer",
+            "example": 1
+          }
+        },
+        "required": [
+          "method",
+          "orderId"
+        ]
+      },
+      "UpdatePayment": {
+        "type": "object",
+        "properties": {
+          "method": {
+            "type": "string",
+            "example": "QR Code"
+          },
+          "orderId": {
+            "type": "integer",
+            "example": 2
+          }
+        }
+      },
+      "Order": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "example": 1
+          },
+          "userId": {
+            "type": "integer",
+            "example": 1
+          },
+          "productId": {
+            "type": "integer",
+            "example": 1
+          },
+          "quantity": {
+            "type": "integer",
+            "example": 2
+          },
+          "totalPrice": {
+            "type": "integer",
+            "example": 200.0
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2024-07-12T12:00:00Z"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2024-07-12T12:00:00Z"
+          }
+        }
+      },
+      "NewOrder": {
+        "type": "object",
+        "properties": {
+          "userId": {
+            "type": "integer",
+            "example": 1
+          },
+          "productId": {
+            "type": "integer",
+            "example": 4
+          },
+          "quantity": {
+            "type": "integer",
+            "example": 5
+          },
+          "totalPrice": {
+            "type": "integer",
+            "example": 1200.0
+          }
+        },
+        "required": [
+          "userId",
+          "productId",
+          "quantity",
+          "totalPrice"
+        ]
+      },
+      "UpdateOrder": {
+        "type": "object",
+        "properties": {
+          "userId": {
+            "type": "integer",
+            "example": 1
+          },
+          "productId": {
+            "type": "integer",
+            "example": 2
+          },
+          "quantity": {
+            "type": "integer",
+            "example": 2
+          },
+          "totalPrice": {
+            "type": "integer",
+            "example": 700.0
           }
         }
       }

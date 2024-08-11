@@ -1,5 +1,5 @@
 const jwt = require("jsonwebtoken");
-const CONST = require("../constant/jwtconstant");
+const CONST = require("../../auth_backend/constant/jwtconstant");
 
 class Auth {
   static authenticate(req, res, next) {
