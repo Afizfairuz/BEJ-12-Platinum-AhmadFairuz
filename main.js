@@ -1,6 +1,10 @@
 const express = require("express");
 const path = require("path");
 const app = express();
+const morgan = require('morgan');
+const upload = require('./utils/uploadStorage');
+const uploadCloudinary = require('./utils/uploadCloudinary');
+const cloudinary = require('./config/config')
 const PORT = 8000;
 
 // Middleware untuk parsing request body
