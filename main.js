@@ -3,7 +3,6 @@ const path = require("path");
 const morgan = require("morgan");
 const multer = require("multer");
 const app = express();
-const morgan = require('morgan');
 const upload = require('./utils/uploadStorage');
 const uploadCloudinary = require('./utils/uploadCloudinary');
 const cloudinary = require('./config/config')
