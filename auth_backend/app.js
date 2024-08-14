@@ -1,11 +1,10 @@
 const express = require("express");
-const path = require("path");
 const app = express();
-const PORT = 8000;
+const path = require("path");
 const morgan = require("morgan");
-const upload = require("./utils/uploadStorage");
-const uploadCloudinary = require("./utils/uploadCloudinary");
-const cloudinary = require("./auth_backend/config/cloudinary");
+const upload = require("../utils/uploadStorage");
+const uploadCloudinary = require("../utils/uploadCloudinary");
+const cloudinary = require("./config/cloudinary");
 
 // Middleware untuk parsing request body
 app.use(express.json());
@@ -31,19 +30,19 @@ app.use(internalServerErrorHandler);
 
 // Router Configuration
 const router = express.Router();
-const promoRouter = require("./auth_backend/router/promo");
+const promoRouter = require("./router/promo");
 
 // Use router
 router.use("/promo", promoRouter);
 app.use("/api", router);
 
 // Inisialisasi repository
-const UserRepository = require("./auth_backend/repository/userRepository");
-const ProductRepository = require("./auth_backend/repository/productRepository");
-const CategoryRepository = require("./auth_backend/repository/categoryRepository");
-const OrderRepository = require("./auth_backend/repository/OrderRepository");
-const ItemRepository = require("./auth_backend/repository/itemRepository");
-const PaymentRepository = require("./auth_backend/repository/paymentRepository");
+const UserRepository = require("./repository/userRepository");
+const ProductRepository = require("./repository/productRepository");
+const CategoryRepository = require("./repository/categoryRepository");
+const OrderRepository = require("./repository/OrderRepository");
+const ItemRepository = require("./repository/ItemRepository");
+const PaymentRepository = require("./repository/paymentRepository");
 
 const userRepository = new UserRepository();
 const productRepository = new ProductRepository();
@@ -53,13 +52,13 @@ const itemRepository = new ItemRepository();
 const paymentRepository = new PaymentRepository();
 
 // Inisialisasi service
-const UserService = require("./auth_backend/service/userService");
-const ProductService = require("./auth_backend/service/productService");
-const CategoryService = require("./auth_backend/service/categoryService");
-const OrderService = require("./auth_backend/service/orderService");
-const ItemService = require("./auth_backend/service/itemService");
-const PaymentService = require("./auth_backend/service/paymentService");
-const AuthService = require("./auth_backend/service/authService");
+const UserService = require("./service/userService");
+const ProductService = require("./service/productService");
+const CategoryService = require("./service/categoryService");
+const OrderService = require("./service/orderService");
+const ItemService = require("./service/itemService");
+const PaymentService = require("./service/paymentService");
+const AuthService = require("./service/authService");
 
 const userService = new UserService(userRepository);
 const productService = new ProductService(productRepository, userRepository);
@@ -70,13 +69,13 @@ const paymentService = new PaymentService(paymentRepository);
 const authService = new AuthService(userRepository);
 
 // Inisialisasi handler
-const UserHandler = require("./auth_backend/handler/userHandler");
-const ProductHandler = require("./auth_backend/handler/productHandler");
-const CategoryHandler = require("./auth_backend/handler/categoryHandler");
-const OrderHandler = require("./auth_backend/handler/orderHandler");
-const ItemHandler = require("./auth_backend/handler/itemHandler");
-const PaymentHandler = require("./auth_backend/handler/paymentHandler");
-const AuthHandler = require("./auth_backend/handler/authHandler");
+const UserHandler = require("./handler/userHandler");
+const ProductHandler = require("./handler/productHandler");
+const CategoryHandler = require("./handler/categoryHandler");
+const OrderHandler = require("./handler/orderHandler");
+const ItemHandler = require("./handler/itemHandler");
+const PaymentHandler = require("./handler/paymentHandler");
+const AuthHandler = require("./handler/authHandler");
 
 const userHandler = new UserHandler(userService);
 const productHandler = new ProductHandler(productService);
@@ -86,7 +85,7 @@ const itemHandler = new ItemHandler(itemService);
 const paymentHandler = new PaymentHandler(paymentService);
 const authHandler = new AuthHandler(authService);
 
-const authMiddleware = require("./auth_backend/middleware/auth");
+const authMiddleware = require("./middleware/auth");
 
 // Route untuk User
 app.get(
@@ -130,8 +129,8 @@ app.delete("/orders/:id", (req, res) => orderHandler.deleteById(req, res));
 app.get("/items", (req, res) => itemHandler.getAll(req, res));
 app.get("/items/:id", (req, res) => itemHandler.getById(req, res));
 app.post("/items", (req, res) => itemHandler.create(req, res));
-app.put("/items/:id", (req, res) => itemHandler.updateById(req, res));
-app.delete("/items/:id", (req, res) => itemHandler.deleteById(req, res));
+app.put("/items/:id", (req, res) => itemHandler.update(req, res));
+app.delete("/items/:id", (req, res) => itemHandler.delete(req, res));
 
 // Endpoint untuk menyajikan gambar
 app.get("/images/binar.png", (req, res) => {
@@ -173,11 +172,8 @@ app.post(
 
 //Swagger
 const swaggerUi = require("swagger-ui-express");
-const swaggerDocument = require("./swagger/swagger.json");
+const swaggerDocument = require("../swagger/swagger.json");
 
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
-// Menjalankan server
-app.listen(PORT, () => {
-  console.log(`Server berjalan pada http://localhost:${PORT}`);
-});
+module.exports = app;
