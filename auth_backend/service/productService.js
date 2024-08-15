@@ -1,4 +1,4 @@
-const ProductRepository = require("../repository/ProductRepository");
+const ProductRepository = require("../repository/productRepository");
 
 class ProductService {
   constructor() {

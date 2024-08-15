@@ -1,6 +1,7 @@
 const express = require("express");
 const path = require("path");
 const app = express();
+const redisClient = require('./config/redis')
 const PORT = 8000;
 
 // Middleware untuk parsing request body
@@ -37,7 +38,7 @@ const UserRepository = require("./auth_backend/repository/userRepository");
 const ProductRepository = require("./auth_backend/repository/productRepository");
 const CategoryRepository = require("./auth_backend/repository/categoryRepository");
 const OrderRepository = require("./auth_backend/repository/OrderRepository");
-const ItemRepository = require("./auth_backend/repository/itemRepository");
+const ItemRepository = require("./auth_backend/repository/ItemRepository");
 const PaymentRepository = require("./auth_backend/repository/paymentRepository");
 
 const userRepository = new UserRepository();
@@ -137,6 +138,31 @@ app.get("/images/binar.png", (req, res) => {
 app.post("/auth/register", (req, res) => authHandler.register(req, res));
 // Endpoint login
 app.post("/auth/login", (req, res) => authHandler.login(req, res));
+
+app.post('/redis', async (req, res) => {
+  const token = req.body.token;
+  const userId = req.body.userId;
+  const dataToSave = {
+    tokens: "token",
+    userIds: "userId"
+  }
+  await redisClient.connect();
+  await redisClient.set("user-2", JSON.stringify(dataToSave));
+  await redisClient.disconnect();
+
+  res.send("success");
+})
+
+app.get('/redis', async (req, res) => {
+  await redisClient.connect();
+  const token = await redisClient.get("user-2");
+  await redisClient.disconnect();
+
+  res.send({
+    "message": "success",
+    "data": token
+  });
+})
 
 //Swagger
 const swaggerUi = require("swagger-ui-express");
