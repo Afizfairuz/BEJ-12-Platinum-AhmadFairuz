@@ -5,6 +5,12 @@
     "description": "Documentation for User Authentication and Operations",
     "version": "1.0.0"
   },
+  "tags": [
+    {
+      "name": "promo",
+      "description": "Everything about promo"
+    }
+  ],
   "paths": {
     "/auth/register": {
       "post": {
@@ -1417,6 +1423,127 @@
           }
         }
       }
+    },
+    "/api/promo/promos": {
+      "get": {
+        "tags": [
+          "promo"
+        ],
+        "summary": "Get all promos",
+        "description": "Get all available promos, if none, it returns empty array",
+        "operationId": "getAllPromos",
+        "responses": {
+          "200": {
+            "description": "List of promos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "Success"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/AllPromo"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseFailed"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/promo/add": {
+      "post": {
+        "tags": [
+          "promo"
+        ],
+        "summary": "Add new promo",
+        "description": "Add new promo to database, if succeded, it will return the new added promo",
+        "operationId": "addNewPromo",
+        "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "description": {
+                      "type": "string",
+                      "example": "Introducing our latest innovation in data management - the [Sample Database Model]. Designed for efficiency and scalability, this model simplifies your data operations and ensures seamless integration with your existing systems."
+                    },
+                    "promoImage": {
+                      "type": "string",
+                      "format": "url",
+                      "example": "https://unsplash.com/photos/a-person-holding-a-camera-in-front-of-a-group-of-people-o4oYRBB1BEg"
+                    }
+                  }
+                }
+              }
+            }
+        },
+        "responses": {
+          "200": {
+            "description": "Successfully added new promo to database",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "Success"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                          "id": {
+                            "type": "integer",
+                            "example": 1
+                          },
+                          "description": {
+                            "type": "string",
+                            "example": "Introducing our latest innovation in data management - the [Sample Database Model]. Designed for efficiency and scalability, this model simplifies your data operations and ensures seamless integration with your existing systems."
+                          },
+                          "promoImage": {
+                            "type": "string",
+                            "format": "url",
+                            "example": "https://unsplash.com/photos/a-person-holding-a-camera-in-front-of-a-group-of-people-o4oYRBB1BEg"
+                          },
+                          "createdAt": {
+                            "type": "string",
+                            "format": "YYYY-MM-ddTHH:MM:ss.SSSZ",
+                            "example": "2024-07-20T14:31:07.395Z"
+                          },
+                          "updatedAt": {
+                            "type": "string",
+                            "format": "YYYY-MM-ddTHH:MM:ss.SSSZ",
+                            "example": "2024-07-20T14:31:07.395Z"
+                          }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -1588,6 +1715,67 @@
           "stock": {
             "type": "integer",
             "example": 12
+          }
+        }
+      },
+      "AllPromo": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "example": 1
+          },
+          "description": {
+            "type": "string",
+            "example": "Introducing our latest innovation in data management - the [Sample Database Model]. Designed for efficiency and scalability, this model simplifies your data operations and ensures seamless integration with your existing systems."
+          },
+          "promoImage": {
+            "type": "string",
+            "format": "url",
+            "example": "https://unsplash.com/photos/a-person-holding-a-camera-in-front-of-a-group-of-people-o4oYRBB1BEg"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "YYYY-MM-ddTHH:MM:ss.SSSZ",
+            "example": "2024-07-20T14:31:07.395Z"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "YYYY-MM-ddTHH:MM:ss.SSSZ",
+            "example": "2024-07-20T14:31:07.395Z"
+          }
+        }
+      },
+      "ApiResponseSuccess": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "example": "Success"
+          },
+          "data": {
+            "type": "object"
+          }
+        }
+      },
+      "ApiResponseFailed": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "example": "Failed"
+          },
+          "error": {
+            "$ref": "#/components/schemas/ApiError"
+          }
+        }
+      },
+      "ApiError": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "example": "Something went wrong"
           }
         }
       },
