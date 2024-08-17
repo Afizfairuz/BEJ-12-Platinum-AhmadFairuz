@@ -28,6 +28,14 @@ User.init(
       type: DataTypes.STRING,
       allowNull: false,
     },
+    token: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    session: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
     profilePicture: {
       type: DataTypes.STRING,
       allowNull: true,

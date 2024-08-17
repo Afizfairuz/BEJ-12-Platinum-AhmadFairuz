@@ -1,5 +1,7 @@
 const express = require("express");
 const path = require("path");
+const session = require("express-session");
+const redisClient = require("./auth_backend/config/redis");
 const morgan = require("morgan");
 const multer = require("multer");
 const app = express();
@@ -31,6 +33,15 @@ const internalServerErrorHandler = (err, req, res, next) => {
 };
 app.use(internalServerErrorHandler);
 
+// session
+app.use(
+  session({
+    secret: "secret",
+    resave: false,
+    saveUninitialized: true,
+    cookie: { secure: false, maxAge: 60000 },
+  })
+);
 // Router Configuration
 const router = express.Router();
 const promoRouter = require("./auth_backend/router/promo");
@@ -46,6 +57,7 @@ const CategoryRepository = require("./auth_backend/repository/categoryRepository
 const OrderRepository = require("./auth_backend/repository/OrderRepository");
 const ItemRepository = require("./auth_backend/repository/ItemRepository");
 const PaymentRepository = require("./auth_backend/repository/paymentRepository");
+const MailRepository = require("./auth_backend/repository/mailRepository");
 
 const userRepository = new UserRepository();
 const productRepository = new ProductRepository();
@@ -53,6 +65,7 @@ const categoryRepository = new CategoryRepository();
 const orderRepository = new OrderRepository();
 const itemRepository = new ItemRepository();
 const paymentRepository = new PaymentRepository();
+const mailRepository = new MailRepository();
 
 // Inisialisasi service
 const UserService = require("./auth_backend/service/userService");
@@ -69,7 +82,7 @@ const categoryService = new CategoryService(categoryRepository);
 const orderService = new OrderService(orderRepository);
 const itemService = new ItemService(itemRepository);
 const paymentService = new PaymentService(paymentRepository);
-const authService = new AuthService(userRepository);
+const authService = new AuthService(userRepository, mailRepository);
 
 // Inisialisasi handler
 const UserHandler = require("./auth_backend/handler/userHandler");
@@ -140,38 +153,110 @@ app.get("/images/binar.png", (req, res) => {
   res.sendFile(path.join(__dirname, "assets", "binar.png"));
 });
 
-// Endpoint Register
+// route untuk auth
 app.post("/auth/register", (req, res) => authHandler.register(req, res));
-// Endpoint login
 app.post("/auth/login", (req, res) => authHandler.login(req, res));
+app.patch("/auth/token/:id", (req, res) => authHandler.createToken(req, res));
+app.get("/auth/token/:id", (req, res) => authHandler.getUserById(req, res));
+app.patch("/auth/logout/:id", (req, res) => authHandler.logout(req, res));
 
-// Endpoint Upload Storage & Cloudinary
-app.post("/files/storage/upload", upload.single("image"), (req, res) => {
-  res.send("success");
+// Redis
+app.post("/auth/redis", async (req, res) => {
+  const { token, session, userId } = req.body;
+  const dataToSave = {
+    token: token,
+    session: session,
+    userId: userId,
+  };
+
+  try {
+    await redisClient.connect();
+    await redisClient.set(`user-${userId}`, JSON.stringify(dataToSave));
+    res.send("success");
+  } catch (error) {
+    res.status(500).send("terjadi kesalahan:", error);
+  } finally {
+    await redisClient.disconnect();
+  }
 });
 
-app.post(
-  "/files/cloudinary/upload",
-  uploadCloudinary.single("image"),
-  async (req, res) => {
-    // TODO: upload to cloudinary storage
-    try {
-      const fileBuffer = req.file?.buffer.toString("base64");
-      const fileString = `data:${req.file?.mimetype};base64,${fileBuffer}`;
+app.get("/auth/redis/:userId", async (req, res) => {
+  try {
+    const { userId } = req.params;
 
-      const uploadedFile = await cloudinary.uploader.upload(fileString);
+    await redisClient.connect();
+    const data = await redisClient.get(`user-${userId}`);
 
-      return res.status(201).send({
-        message: "succes",
-        image: uploadedFile.secure_url,
+    if (data) {
+      res.status(200).send({
+        message: "success",
+        data: data,
       });
-    } catch (error) {
-      return res.status(400).send({
-        message: error,
+    } else {
+      res.status(400).send({
+        message: "data tidak ditemukan",
       });
     }
+  } catch (error) {
+    res.status(500).send("terjadi kesalahan:", error);
+  } finally {
+    await redisClient.disconnect();
   }
-);
+});
+
+app.delete("/auth/redis/:userId", async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    await redisClient.connect();
+    const data = await redisClient.get(`user-${userId}`);
+
+    if (data) {
+      await redisClient.del(`user-${userId}`);
+
+      res.status(200).send({
+        message: "success to logout",
+        data: data,
+      });
+    } else {
+      res.status(400).send({
+        message: "gagal logout",
+      });
+    }
+  } catch (error) {
+    res.status(500).send("terjadi kesalahan:", error);
+  } finally {
+    await redisClient.disconnect();
+  }
+});
+
+// Endpoint Upload Storage & Cloudinary
+// app.post("/files/storage/upload", upload.single("image"), (req, res) => {
+//   res.send("success");
+// });
+
+// app.post(
+//   "/files/cloudinary/upload",
+//   uploadCloudinary.single("image"),
+//   async (req, res) => {
+//     // TODO: upload to cloudinary storage
+//     try {
+//       const fileBuffer = req.file?.buffer.toString("base64");
+//       const fileString = `data:${req.file?.mimetype};base64,${fileBuffer}`;
+
+//       const uploadedFile = await cloudinary.uploader.upload(fileString);
+
+//       return res.status(201).send({
+//         message: "succes",
+//         image: uploadedFile.secure_url,
+//       });
+//     } catch (error) {
+//       return res.status(400).send({
+//         message: error,
+//       });
+//     }
+//   }
+// );
 
 app.post('/redis', async (req, res) => {
   const token = req.body.token;
