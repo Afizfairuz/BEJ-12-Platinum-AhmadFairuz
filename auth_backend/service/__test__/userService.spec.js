@@ -1,4 +1,4 @@
-const UserService = require("../../service/userService");
+const UserService = require("../userService");
 const UserRepository = require("../../repository/userRepository");
 
 // Mocking the UserRepository

@@ -1,4 +1,4 @@
-const UserHandler = require("../../handler/userHandler");
+const UserHandler = require("../userHandler");
 const UserService = require("../../service/userService");
 
 // Mocking the UserService
