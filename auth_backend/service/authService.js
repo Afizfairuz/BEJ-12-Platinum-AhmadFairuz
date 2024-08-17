@@ -1,10 +1,11 @@
-const bcrypt = require("bcryptjs");
+const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const CONST = require("../../auth_backend/constant/jwtconstant");
 
 class AuthService {
-  constructor(userRepository) {
+  constructor(userRepository, mailRepository) {
     this.userRepository = userRepository;
+    this.mailRepository = mailRepository;
   }
 
   async register({ name, email, password }) {
@@ -26,9 +27,37 @@ class AuthService {
         password: encryptedPassword,
       });
 
+      // nodemailer
+      const mail = {
+        from: "kelompok2-bej12@gmail.com",
+        to: email,
+        subject: "verifikasi akun bingle shop",
+        text: "kode verifikasi anda adalah : 73648",
+      };
+
+      // function generateOTP() {
+      //   const otp = Math.floor(100000 + Math.random() * 900000);
+      //   return otp.toString();
+      // }
+
+     
+
+      try {
+        const sendMail = await this.mailRepository.sendMail(mail)
+        console.log("Email berhasil dikirim:", sendMail);
+      } catch (mailError) {
+        console.error("Gagal mengirim email:", mailError);
+        return {
+          statusCode: 500,
+          message: "Berhasil mendaftar, tetapi gagal mengirim email verifikasi",
+          createdUser: newUser,
+        };
+      }
+
       return {
         statusCode: 201,
         message: "berhasil melakukan register",
+        // sendMail: sendMail,
         createdUser: newUser,
       };
     } catch (err) {

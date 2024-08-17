@@ -103,6 +103,14 @@ class UserRepository {
       throw new Error(`Failed to delete token and session: ${error.message}`);
     }
   }
+  
+  async deleteByEmail(email) {
+    await User.destroy({
+      where: {
+        email: email,
+      },
+    });
+  }
 }
 
 module.exports = UserRepository;

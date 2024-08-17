@@ -17,6 +17,7 @@ class AuthHandler {
     res.status(serviceRes.statusCode).send({
       message: serviceRes.message,
       created_user: serviceRes.createdUser,
+      // send_mail:serviceRes.sendMail
     });
   }
 
