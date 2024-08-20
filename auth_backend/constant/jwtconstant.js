@@ -1,4 +1,4 @@
 exports.JWT = {
     SECRET: "SECRET",
-    EXPIRE_TIME: "24h"
+    EXPIRE_TIME: "24h",
   }
