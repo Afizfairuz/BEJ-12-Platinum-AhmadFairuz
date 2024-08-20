@@ -28,6 +28,14 @@ module.exports = {
           createdAt: now,
           updatedAt: now,
         },
+        {
+          // digunakan untuk mendapatkan data user
+          name: "admin",
+          email: "admin@gmail.com",
+          password: "admin123",
+          createdAt: now,
+          updatedAt: now,
+        },
       ],
       {}
     );

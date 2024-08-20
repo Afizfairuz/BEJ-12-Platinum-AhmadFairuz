@@ -1,10 +1,11 @@
-const bcrypt = require("bcryptjs");
+const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const CONST = require("../../auth_backend/constant/jwtconstant");
 
 class AuthService {
-  constructor(userRepository) {
+  constructor(userRepository, mailRepository) {
     this.userRepository = userRepository;
+    this.mailRepository = mailRepository;
   }
 
   async register({ name, email, password }) {
@@ -26,53 +27,139 @@ class AuthService {
         password: encryptedPassword,
       });
 
+      // nodemailer
+      const mail = {
+        from: "kelompok2-bej12@gmail.com",
+        to: email,
+        subject: "verifikasi akun bingle shop",
+        text: "kode verifikasi anda adalah : 73648",
+      };
+
+      // function generateOTP() {
+      //   const otp = Math.floor(100000 + Math.random() * 900000);
+      //   return otp.toString();
+      // }
+
+     
+
+      try {
+        const sendMail = await this.mailRepository.sendMail(mail)
+        console.log("Email berhasil dikirim:", sendMail);
+      } catch (mailError) {
+        console.error("Gagal mengirim email:", mailError);
+        return {
+          statusCode: 500,
+          message: "Berhasil mendaftar, tetapi gagal mengirim email verifikasi",
+          createdUser: newUser,
+        };
+      }
+
       return {
         statusCode: 201,
+        message: "berhasil melakukan register",
+        // sendMail: sendMail,
         createdUser: newUser,
       };
     } catch (err) {
       return {
         statusCode: 500,
+        message: `Terjadi kesalahan: ${err.message}`,
         createdUser: null,
       };
     }
   }
 
   async login({ email, password }) {
-    const user = await this.userRepository.getUserByEmail(email);
+    try {
+      const user = await this.userRepository.getUserByEmail(email);
+      if (!user) {
+        return { message: "User not found" };
+      }
+      const userValid = bcrypt.compareSync(password, user.password);
+      if (userValid) {
+        const token = jwt.sign(
+          {
+            email: user.email,
+          },
+          CONST.JWT.SECRET,
+          {
+            expiresIn: CONST.JWT.EXPIRE_TIME,
+          }
+        );
 
-    if (!user) {
-      throw new Error("User not found");
-    }
-
-    const userValid = bcrypt.compareSync(password, user.password);
-
-    if (userValid) {
-      // generate jwt token
-      const jwtSecret = "SECRET";
-      const jwtExpireTime = "24h";
-
-      const token = jwt.sign(
-        {
-          email: user.email,
-        },
-        CONST.JWT.SECRET,
-        {
-          expiresIn: CONST.JWT.EXPIRE_TIME,
-        }
-      );
+        return {
+          statusCode: 200,
+          message: "Login berhasil",
+          token: token,
+        };
+      }
       return {
-        statusCode: 200,
-        message: "Login berhasil",
-        token: token,
+        statusCode: 400,
+        message: "Login gagal",
+        token: null,
+      };
+    } catch (err) {
+      return {
+        statusCode: 500,
+        message: `Terjadi kesalahan: ${err.message}`,
       };
     }
+  }
 
-    return {
-      statusCode: 400,
-      message: "Login gagal",
-      token: null,
-    };
+  async createToken(id, user) {
+    try {
+      const tokenUser = await this.userRepository.createToken(id, user);
+      if (tokenUser) {
+        return {
+          statusCode: 200,
+          message: "berhasil membuat token dan session",
+          data: tokenUser,
+        };
+      }
+    } catch (err) {
+      return {
+        statusCode: 500,
+        message: `Terjadi kesalahan: ${err.message}`,
+      };
+    }
+  }
+  async getToken(id) {
+    try {
+      const tokenUser = await this.userRepository.getUserById(id);
+      if (tokenUser) {
+        return {
+          statusCode: 200,
+          message: "berhasil mendapatkan data token dan session",
+          data: tokenUser,
+        };
+      }
+    } catch (err) {
+      return {
+        statusCode: 500,
+        message: `Terjadi kesalahan: ${err.message}`,
+      };
+    }
+  }
+  async logout(id) {
+    try {
+      const tokenUser = await this.userRepository.deleteToken(id);
+      if (tokenUser) {
+        return {
+          statusCode: 200,
+          message: "berhasil logout",
+        };
+      } else {
+        return {
+          statusCode: 404,
+          message: "User tidak ditemukan",
+        };
+      }
+    } catch (err) {
+      return {
+        statusCode: 500,
+        message: `Terjadi kesalahan: ${err.message}`,
+      };
+    }
   }
 }
 
