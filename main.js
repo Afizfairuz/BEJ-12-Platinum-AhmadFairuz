@@ -7,7 +7,16 @@ const upload = require('./utils/uploadStorage');
 const uploadCloudinary = require('./utils/uploadCloudinary');
 const cloudinary = require('./config/config')
 const redisClient = require('./config/redis')
+const http = require("http");
+const socketIo = require("socket.io");
+const setupSocket = require("./auth_backend/socket/events");
+const logger = require("./auth_backend/utilssocket/logger");
 const PORT = 8000;
+
+const server = http.createServer(app);
+const io = socketIo(server);
+app.use(express.static('publicsocket'));
+
 
 // Middleware untuk parsing request body
 app.use(express.json());
@@ -203,6 +212,9 @@ const swaggerUi = require("swagger-ui-express");
 const swaggerDocument = require("./swagger/swagger.json");
 
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+
+// Setup Socket.IO
+setupSocket(io);
 
 // Menjalankan server
 app.listen(PORT, () => {
