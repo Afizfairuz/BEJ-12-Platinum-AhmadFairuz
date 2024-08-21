@@ -8,7 +8,6 @@ const app = express();
 const upload = require('./utils/uploadStorage');
 const uploadCloudinary = require('./utils/uploadCloudinary');
 const cloudinary = require('./config/config')
-const redisClient = require('./config/redis')
 const PORT = 8000;
 
 // Middleware untuk parsing request body
@@ -231,32 +230,32 @@ app.delete("/auth/redis/:userId", async (req, res) => {
 });
 
 // Endpoint Upload Storage & Cloudinary
-// app.post("/files/storage/upload", upload.single("image"), (req, res) => {
-//   res.send("success");
-// });
+app.post("/files/storage/upload", upload.single("image"), (req, res) => {
+  res.send("success");
+});
 
-// app.post(
-//   "/files/cloudinary/upload",
-//   uploadCloudinary.single("image"),
-//   async (req, res) => {
-//     // TODO: upload to cloudinary storage
-//     try {
-//       const fileBuffer = req.file?.buffer.toString("base64");
-//       const fileString = `data:${req.file?.mimetype};base64,${fileBuffer}`;
+app.post(
+  "/files/cloudinary/upload",
+  uploadCloudinary.single("image"),
+  async (req, res) => {
+    // TODO: upload to cloudinary storage
+    try {
+      const fileBuffer = req.file?.buffer.toString("base64");
+      const fileString = `data:${req.file?.mimetype};base64,${fileBuffer}`;
 
-//       const uploadedFile = await cloudinary.uploader.upload(fileString);
+      const uploadedFile = await cloudinary.uploader.upload(fileString);
 
-//       return res.status(201).send({
-//         message: "succes",
-//         image: uploadedFile.secure_url,
-//       });
-//     } catch (error) {
-//       return res.status(400).send({
-//         message: error,
-//       });
-//     }
-//   }
-// );
+      return res.status(201).send({
+        message: "succes",
+        image: uploadedFile.secure_url,
+      });
+    } catch (error) {
+      return res.status(400).send({
+        message: error,
+      });
+    }
+  }
+);
 
 app.post('/redis', async (req, res) => {
   const token = req.body.token;

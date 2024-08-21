@@ -7,7 +7,7 @@ class AuthService {
     this.userRepository = userRepository;
     this.mailRepository = mailRepository;
   }
-
+  
   async register({ name, email, password }) {
     try {
       const emailUser = await this.userRepository.getUserByEmail(email);
@@ -17,34 +17,36 @@ class AuthService {
           message: "Pengguna sudah ada",
         };
       }
-
+      
       const salt = 10;
       const encryptedPassword = bcrypt.hashSync(password, salt);
-
+      
       const newUser = await this.userRepository.createUser({
         name,
         email,
         password: encryptedPassword,
       });
-
+      
+            function generateOTP() {
+              const otp = Math.floor(100000 + Math.random() * 900000);
+              return otp.toString();
+            }
+      
       // nodemailer
       const mail = {
-        from: "kelompok2-bej12@gmail.com",
-        to: email,
-        subject: "verifikasi akun bingle shop",
-        text: "kode verifikasi anda adalah : 73648",
+        from: 'kelompok2-bej12@gmail.com',
+        to: 'javidnam7@gmail.com',
+        subject: 'verifikasi akun bingle shop',
+        text: `Kode verifikasi anda adalah: ${generateOTP()}`,
       };
-
-      // function generateOTP() {
-      //   const otp = Math.floor(100000 + Math.random() * 900000);
-      //   return otp.toString();
-      // }
-
-     
 
       try {
         const sendMail = await this.mailRepository.sendMail(mail)
         console.log("Email berhasil dikirim:", sendMail);
+        console.log("Email:", mail);
+        console.log("Respons server:", sendMail.response);
+
+
       } catch (mailError) {
         console.error("Gagal mengirim email:", mailError);
         return {
@@ -57,7 +59,6 @@ class AuthService {
       return {
         statusCode: 201,
         message: "berhasil melakukan register",
-        // sendMail: sendMail,
         createdUser: newUser,
       };
     } catch (err) {
