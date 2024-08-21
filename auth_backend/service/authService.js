@@ -34,27 +34,27 @@ class AuthService {
       
       // nodemailer
       const mail = {
-        from: 'kelompok2-bej12@gmail.com',
-        to: 'javidnam7@gmail.com',
+        from: 'faruuq.aiesec@gmail.com',
+        to: 'faruuq.q@icloud.com',
         subject: 'verifikasi akun bingle shop',
         text: `Kode verifikasi anda adalah: ${generateOTP()}`,
       };
 
-      try {
+      // try {
         const sendMail = await this.mailRepository.sendMail(mail)
         console.log("Email berhasil dikirim:", sendMail);
         console.log("Email:", mail);
-        console.log("Respons server:", sendMail.response);
+        // console.log("Respons server:", sendMail.response);
 
 
-      } catch (mailError) {
-        console.error("Gagal mengirim email:", mailError);
-        return {
-          statusCode: 500,
-          message: "Berhasil mendaftar, tetapi gagal mengirim email verifikasi",
-          createdUser: newUser,
-        };
-      }
+      // } catch (mailError) {
+      //   console.error("Gagal mengirim email:", mailError);
+      //   return {
+      //     statusCode: 500,
+      //     message: "Berhasil mendaftar, tetapi gagal mengirim email verifikasi",
+      //     createdUser: newUser,
+      //   };
+      // }
 
       return {
         statusCode: 201,

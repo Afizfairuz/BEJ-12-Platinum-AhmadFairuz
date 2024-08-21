@@ -3,8 +3,8 @@ const smtp = {
     port: 465,
     secure: true,
     auth: {
-user:'kelompok2-bej12@gmail.com',
-pass:'cell isde ltbg lche'
+        user: 'faruuq.aiesec@gmail.com',
+        pass: 'wgaz ymtl pebs vyhl'
     },
 }
 module.exports = smtp
