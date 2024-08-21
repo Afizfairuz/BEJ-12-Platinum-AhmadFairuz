@@ -44,7 +44,7 @@ class AuthService {
         const sendMail = await this.mailRepository.sendMail(mail)
         console.log("Email berhasil dikirim:", sendMail);
         console.log("Email:", mail);
-        console.log("Respons server:", sendMail.response);
+        // console.log("Respons server:", sendMail.response);
 
 
       } catch (mailError) {
