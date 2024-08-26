@@ -7,7 +7,7 @@ class AuthService {
     this.userRepository = userRepository;
     this.mailRepository = mailRepository;
   }
-  
+
   async register({ name, email, password }) {
     try {
       const emailUser = await this.userRepository.getUserByEmail(email);
@@ -17,44 +17,57 @@ class AuthService {
           message: "Pengguna sudah ada",
         };
       }
-      
+
       const salt = 10;
       const encryptedPassword = bcrypt.hashSync(password, salt);
-      
+
       const newUser = await this.userRepository.createUser({
         name,
         email,
         password: encryptedPassword,
       });
-      
-            function generateOTP() {
-              const otp = Math.floor(100000 + Math.random() * 900000);
-              return otp.toString();
-            }
-      
+
+      function generateOTP() {
+        const otp = Math.floor(100000 + Math.random() * 900000);
+        return otp.toString();
+      }
+
+      if (!newUser) {
+        throw new Error("Failed to create user");
+      } else if (newUser) {
+        const otp = generateOTP();
+
+        await this.userRepository.createOtp(newUser.id, otp);
+      }
+
       // nodemailer
       const mail = {
-        from: 'faruuq.aiesec@gmail.com',
-        to: 'faruuq.q@icloud.com',
-        subject: 'verifikasi akun bingle shop',
-        text: `Kode verifikasi anda adalah: ${generateOTP()}`,
+        from: '"Bingle Shop" <kelompok2-bej12@gmail.com>',
+        to: "javidnam3@gmail.com",
+        subject: "verifikasi akun bingle shop",
+        html: `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #ddd; border-radius: 10px; background-color: #f9f9f9;">
+        <h2 style="text-align: center; color: #333;">Verifikasi Akun Bingle Shop</h2>
+        <p style="font-size: 16px; color: #555;">
+          Terima kasih telah mendaftar di <strong>Bingle Shop</strong>! Untuk menyelesaikan proses registrasi, silakan masukkan kode verifikasi berikut di halaman verifikasi:
+        </p>
+        <div style="text-align: center; margin: 20px 0;">
+          <span style="font-size: 24px; font-weight: bold; color: #4CAF50;">${otp}</span>
+        </div>
+        <p style="font-size: 16px; color: #555;">
+          Jika Anda tidak melakukan pendaftaran ini, harap abaikan email ini.
+        </p>
+        <hr style="border: none; border-top: 1px solid #ddd; margin: 20px 0;" />
+        <p style="font-size: 14px; color: #999; text-align: center;">
+          &copy; 2024 Bingle Shop. All rights reserved.
+        </p>
+      </div>
+    `,
       };
 
-      // try {
-        const sendMail = await this.mailRepository.sendMail(mail)
-        console.log("Email berhasil dikirim:", sendMail);
-        console.log("Email:", mail);
-        // console.log("Respons server:", sendMail.response);
-
-
-      // } catch (mailError) {
-      //   console.error("Gagal mengirim email:", mailError);
-      //   return {
-      //     statusCode: 500,
-      //     message: "Berhasil mendaftar, tetapi gagal mengirim email verifikasi",
-      //     createdUser: newUser,
-      //   };
-      // }
+      const sendMail = await this.mailRepository.sendMail(mail);
+      console.log("Email berhasil dikirim:", sendMail);
+      console.log("Email:", mail);
 
       return {
         statusCode: 201,
@@ -124,23 +137,8 @@ class AuthService {
       };
     }
   }
-  async getToken(id) {
-    try {
-      const tokenUser = await this.userRepository.getUserById(id);
-      if (tokenUser) {
-        return {
-          statusCode: 200,
-          message: "berhasil mendapatkan data token dan session",
-          data: tokenUser,
-        };
-      }
-    } catch (err) {
-      return {
-        statusCode: 500,
-        message: `Terjadi kesalahan: ${err.message}`,
-      };
-    }
-  }
+
+
   async logout(id) {
     try {
       const tokenUser = await this.userRepository.deleteToken(id);
@@ -154,6 +152,29 @@ class AuthService {
           statusCode: 404,
           message: "User tidak ditemukan",
         };
+      }
+    } catch (err) {
+      return {
+        statusCode: 500,
+        message: `Terjadi kesalahan: ${err.message}`,
+      };
+    }
+  }
+
+  async validateOtp(otp) {
+    try {
+      const otpUser = await this.userRepository.getUserByOtp(otp);
+      if (otpUser) {
+        return {
+          statusCode: 200,
+          message: "berhasil mendapatkan data berdasarkan otp",
+          data: otpUser,
+        };
+      } else {
+        return{
+          statusCode: 400,
+          message: "gagal mendapatkan data",
+        }
       }
     } catch (err) {
       return {

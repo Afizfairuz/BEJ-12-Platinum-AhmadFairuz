@@ -6,8 +6,8 @@ class AuthHandler {
     this.register = this.register.bind(this);
     this.login = this.login.bind(this);
     this.createToken = this.createToken.bind(this);
-    this.getUserById = this.getUserById.bind(this);
     this.logout = this.logout.bind(this);
+    this.validateOtp = this.validateOtp.bind(this);
   }
 
   async register(req, res) {
@@ -41,22 +41,22 @@ class AuthHandler {
     });
   }
 
-  async getUserById(req, res) {
-    const id = req.params.id;
-    const serviceRes = await this.authService.getToken(id);
-
-    res.status(serviceRes.statusCode).send({
-      message: serviceRes.message,
-      data: serviceRes.data,
-    });
-  }
-
   async logout(req, res) {
     const id = req.params.id;
     const serviceRes = await this.authService.logout(id);
 
     res.status(serviceRes.statusCode).send({
       message: serviceRes.message,
+    });
+  }
+
+  async validateOtp(req, res) {
+    const otp = req.query.otp;
+    const serviceRes = await this.authService.validateOtp(otp);
+
+    res.status(serviceRes.statusCode).send({
+      message: serviceRes.message,
+      data: serviceRes.data,
     });
   }
 }

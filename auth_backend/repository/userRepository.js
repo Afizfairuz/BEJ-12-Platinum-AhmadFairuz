@@ -84,18 +84,9 @@ class UserRepository {
     }
   }
 
-  async getUserById(id) {
-    try {
-      const userId = await this.User.findOne({ where: { id } });
-      return userId;
-    } catch (error) {
-      throw new Error(`Failed to get token and session: ${error.message}`);
-    }
-  }
-
   async deleteToken(id) {
     try {
-      const data = { token: "", session: "" };
+      const data = { token: null, session: null };
 
       const deletedToken = await this.User.update(data, { where: { id } });
       return deletedToken;
@@ -103,13 +94,27 @@ class UserRepository {
       throw new Error(`Failed to delete token and session: ${error.message}`);
     }
   }
-  
-  async deleteByEmail(email) {
-    await User.destroy({
-      where: {
-        email: email,
-      },
-    });
+
+  async createOtp(userId, otp) {
+    try {
+      const data = { otp: otp };
+      const newOtp = await this.User.update(data, { where: { id: userId } });
+      if (newOtp[0] === 0) {
+        throw new Error("User not found or OTP update failed");
+      }
+      return newOtp;
+    } catch (error) {
+      throw new Error(`Failed to create otp: ${error.message}`);
+    }
+  }
+
+  async getUserByOtp(otp) {
+    try {
+      const user = await this.User.findOne({ where: { otp } });
+      return user;
+    } catch (error) {
+      throw new Error(`Failed to get otp: ${error.message}`);
+    }
   }
 }
 

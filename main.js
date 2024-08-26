@@ -5,9 +5,9 @@ const redisClient = require("./auth_backend/config/redis");
 const morgan = require("morgan");
 const multer = require("multer");
 const app = express();
-const upload = require('./utils/uploadStorage');
-const uploadCloudinary = require('./utils/uploadCloudinary');
-const cloudinary = require('./config/config')
+const upload = require("./utils/uploadStorage");
+const uploadCloudinary = require("./utils/uploadCloudinary");
+const cloudinary = require("./config/config");
 const PORT = 8000;
 
 // Middleware untuk parsing request body
@@ -156,11 +156,11 @@ app.get("/images/binar.png", (req, res) => {
 app.post("/auth/register", (req, res) => authHandler.register(req, res));
 app.post("/auth/login", (req, res) => authHandler.login(req, res));
 app.patch("/auth/token/:id", (req, res) => authHandler.createToken(req, res));
-app.get("/auth/token/:id", (req, res) => authHandler.getUserById(req, res));
 app.patch("/auth/logout/:id", (req, res) => authHandler.logout(req, res));
+app.get("/auth/otp", (req, res) => authHandler.validateOtp(req, res));
 
-// Redis
-app.post("/auth/redis", async (req, res) => {
+// Redis untuk auth
+app.post("/auth/token", async (req, res) => {
   const { token, session, userId } = req.body;
   const dataToSave = {
     token: token,
@@ -171,7 +171,7 @@ app.post("/auth/redis", async (req, res) => {
   try {
     await redisClient.connect();
     await redisClient.set(`user-${userId}`, JSON.stringify(dataToSave));
-    res.send("success");
+    res.send("success menyimpan token");
   } catch (error) {
     res.status(500).send("terjadi kesalahan:", error);
   } finally {
@@ -179,7 +179,7 @@ app.post("/auth/redis", async (req, res) => {
   }
 });
 
-app.get("/auth/redis/:userId", async (req, res) => {
+app.get("/auth/token/:userId", async (req, res) => {
   try {
     const { userId } = req.params;
 
@@ -188,7 +188,7 @@ app.get("/auth/redis/:userId", async (req, res) => {
 
     if (data) {
       res.status(200).send({
-        message: "success",
+        message: "success mendapatkan data",
         data: data,
       });
     } else {
@@ -203,7 +203,7 @@ app.get("/auth/redis/:userId", async (req, res) => {
   }
 });
 
-app.delete("/auth/redis/:userId", async (req, res) => {
+app.delete("/auth/token/:userId", async (req, res) => {
   try {
     const { userId } = req.params;
 
@@ -220,6 +220,48 @@ app.delete("/auth/redis/:userId", async (req, res) => {
     } else {
       res.status(400).send({
         message: "gagal logout",
+      });
+    }
+  } catch (error) {
+    res.status(500).send("terjadi kesalahan:", error);
+  } finally {
+    await redisClient.disconnect();
+  }
+});
+
+app.post("/auth/otp", async (req, res) => {
+  const { otp, userId } = req.body;
+  const dataToSave = {
+    otp: otp,
+    userId: userId,
+  };
+
+  try {
+    await redisClient.connect();
+    await redisClient.set(`user-${userId}`, JSON.stringify(dataToSave));
+    res.send("success menyimpan otp");
+  } catch (error) {
+    res.status(500).send("terjadi kesalahan:", error);
+  } finally {
+    await redisClient.disconnect();
+  }
+});
+
+app.get("/auth/otp", async (req, res) => {
+  try {
+    const { otp } = req.body;
+
+    await redisClient.connect();
+    const data = await redisClient.get(`user-${otp}`);
+
+    if (data) {
+      res.status(200).send({
+        message: "success mendapatkan data",
+        data: data,
+      });
+    } else {
+      res.status(400).send({
+        message: "data tidak ditemukan",
       });
     }
   } catch (error) {
@@ -256,31 +298,6 @@ app.post(
     }
   }
 );
-
-app.post('/redis', async (req, res) => {
-  const token = req.body.token;
-  const userId = req.body.userId;
-  const dataToSave = {
-    tokens: "token",
-    userIds: "userId"
-  }
-  await redisClient.connect();
-  await redisClient.set("user-2", JSON.stringify(dataToSave));
-  await redisClient.disconnect();
-
-  res.send("success");
-})
-
-app.get('/redis', async (req, res) => {
-  await redisClient.connect();
-  const token = await redisClient.get("user-2");
-  await redisClient.disconnect();
-
-  res.send({
-    "message": "success",
-    "data": token
-  });
-})
 
 //Swagger
 const swaggerUi = require("swagger-ui-express");
