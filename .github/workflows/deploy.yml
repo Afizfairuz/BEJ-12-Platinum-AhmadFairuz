@@ -14,12 +14,12 @@ jobs:
         uses: appleboy/ssh-action@master
         with:
           host: '34.31.195.255'
-          username: 'root'
+          username: 'faruuq'
           key: ${{ secrets.GCP_SSH_PRIVATE_KEY }}
           port: 22
           script: |
             git config --global --add safe.directory /home/team2/BEJ-12-Platinum
-            
+
             # curl -sL https://deb.nodesource.com/setup_20.x | sudo -E bash -
             # apt install -y nodejs
 
