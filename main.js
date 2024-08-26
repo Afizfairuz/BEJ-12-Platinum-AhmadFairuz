@@ -5,10 +5,19 @@ const redisClient = require("./auth_backend/config/redis");
 const morgan = require("morgan");
 const multer = require("multer");
 const app = express();
-const upload = require("./utils/uploadStorage");
-const uploadCloudinary = require("./utils/uploadCloudinary");
-const cloudinary = require("./config/config");
+const upload = require('./utils/uploadStorage');
+const uploadCloudinary = require('./utils/uploadCloudinary');
+const cloudinary = require('./config/config')
+const http = require("http");
+const socketIo = require("socket.io");
+const setupSocket = require("./auth_backend/socket/events");
+const logger = require("./auth_backend/utilssocket/logger");
 const PORT = 8000;
+
+const server = http.createServer(app);
+const io = socketIo(server);
+app.use(express.static('publicsocket'));
+
 
 // Middleware untuk parsing request body
 app.use(express.json());
@@ -56,7 +65,7 @@ const CategoryRepository = require("./auth_backend/repository/categoryRepository
 const OrderRepository = require("./auth_backend/repository/OrderRepository");
 const ItemRepository = require("./auth_backend/repository/ItemRepository");
 const PaymentRepository = require("./auth_backend/repository/paymentRepository");
-const MailRepository = require("./auth_backend/repository/mailRepository");
+// const MailRepository = require("./auth_backend/repository/mailRepository");
 
 const userRepository = new UserRepository();
 const productRepository = new ProductRepository();
@@ -64,7 +73,7 @@ const categoryRepository = new CategoryRepository();
 const orderRepository = new OrderRepository();
 const itemRepository = new ItemRepository();
 const paymentRepository = new PaymentRepository();
-const mailRepository = new MailRepository();
+// const mailRepository = new MailRepository();
 
 // Inisialisasi service
 const UserService = require("./auth_backend/service/userService");
@@ -81,7 +90,7 @@ const categoryService = new CategoryService(categoryRepository);
 const orderService = new OrderService(orderRepository);
 const itemService = new ItemService(itemRepository);
 const paymentService = new PaymentService(paymentRepository);
-const authService = new AuthService(userRepository, mailRepository);
+// const authService = new AuthService(userRepository, mailRepository);
 
 // Inisialisasi handler
 const UserHandler = require("./auth_backend/handler/userHandler");
@@ -98,7 +107,7 @@ const categoryHandler = new CategoryHandler(categoryService);
 const orderHandler = new OrderHandler(orderService);
 const itemHandler = new ItemHandler(itemService);
 const paymentHandler = new PaymentHandler(paymentService);
-const authHandler = new AuthHandler(authService);
+const authHandler = new AuthHandler(AuthService);
 
 const authMiddleware = require("./auth_backend/middleware/auth");
 
@@ -304,6 +313,9 @@ const swaggerUi = require("swagger-ui-express");
 const swaggerDocument = require("./swagger/swagger.json");
 
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+
+// Setup Socket.IO
+setupSocket(io);
 
 // Menjalankan server
 app.listen(PORT, () => {
