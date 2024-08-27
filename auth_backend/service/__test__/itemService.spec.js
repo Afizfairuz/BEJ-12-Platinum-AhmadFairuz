@@ -54,7 +54,7 @@ describe("ItemService", () => {
   });
 
   // Positive Case for getItemById
-  it("should return a user by id", async () => {
+  it("should return a item by id", async () => {
     const id = 4;
     const foundItem = {
       id: 4,

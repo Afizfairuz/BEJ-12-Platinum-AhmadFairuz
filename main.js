@@ -8,8 +8,15 @@ const app = express();
 const upload = require('./utils/uploadStorage');
 const uploadCloudinary = require('./utils/uploadCloudinary');
 const cloudinary = require('./config/config')
+const http = require("http");
+const socketIo = require("socket.io");
+const setupSocket = require("./auth_backend/socket/events");
+const logger = require("./auth_backend/utilssocket/logger");
 const PORT = 8000;
 
+const server = http.createServer(app);
+const io = socketIo(server);
+app.use(express.static('publicsocket'));
 
 
 // Middleware untuk parsing request body
@@ -232,58 +239,58 @@ app.delete("/auth/redis/:userId", async (req, res) => {
 });
 
 // Endpoint Upload Storage & Cloudinary
-// app.post("/files/storage/upload", upload.single("image"), (req, res) => {
-//   res.send("success");
-// });
+app.post("/files/storage/upload", upload.single("image"), (req, res) => {
+  res.send("success");
+});
 
-// app.post(
-//   "/files/cloudinary/upload",
-//   uploadCloudinary.single("image"),
-//   async (req, res) => {
-//     // TODO: upload to cloudinary storage
-//     try {
-//       const fileBuffer = req.file?.buffer.toString("base64");
-//       const fileString = `data:${req.file?.mimetype};base64,${fileBuffer}`;
+app.post(
+  "/files/cloudinary/upload",
+  uploadCloudinary.single("image"),
+  async (req, res) => {
+    // TODO: upload to cloudinary storage
+    try {
+      const fileBuffer = req.file?.buffer.toString("base64");
+      const fileString = `data:${req.file?.mimetype};base64,${fileBuffer}`;
 
-//       const uploadedFile = await cloudinary.uploader.upload(fileString);
+      const uploadedFile = await cloudinary.uploader.upload(fileString);
 
-//       return res.status(201).send({
-//         message: "succes",
-//         image: uploadedFile.secure_url,
-//       });
-//     } catch (error) {
-//       return res.status(400).send({
-//         message: error,
-//       });
-//     }
-//   }
-// );
+      return res.status(201).send({
+        message: "succes",
+        image: uploadedFile.secure_url,
+      });
+    } catch (error) {
+      return res.status(400).send({
+        message: error,
+      });
+    }
+  }
+);
 
-app.post('/redis', async (req, res) => {
+app.post("/redis", async (req, res) => {
   const token = req.body.token;
   const userId = req.body.userId;
   const dataToSave = {
     tokens: "token",
-    userIds: "userId"
-  }
+    userIds: "userId",
+  };
   await redisClient.connect();
   await redisClient.set("user-2", JSON.stringify(dataToSave));
   await redisClient.disconnect();
 
   res.send("success");
-})
+});
 
-app.get('/redis', async (req, res) => {
+app.get("/redis", async (req, res) => {
   await redisClient.connect();
   const token = await redisClient.get("user-2");
   await redisClient.disconnect();
 
   res.send({
-    "message": "success",
-    "data": token
+    message: "success",
+    data: token,
   });
-})
-//  faruuq changes
+});
+//  faruuq changes 222
 //Swagger
 const swaggerUi = require("swagger-ui-express");
 const swaggerDocument = require("./swagger/swagger.json");
