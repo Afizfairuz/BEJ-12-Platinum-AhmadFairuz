@@ -8,15 +8,7 @@ const app = express();
 const upload = require('./utils/uploadStorage');
 const uploadCloudinary = require('./utils/uploadCloudinary');
 const cloudinary = require('./config/config')
-const http = require("http");
-const socketIo = require("socket.io");
-const setupSocket = require("./auth_backend/socket/events");
-const logger = require("./auth_backend/utilssocket/logger");
 const PORT = 8000;
-
-const server = http.createServer(app);
-const io = socketIo(server);
-app.use(express.static('publicsocket'));
 
 
 // Middleware untuk parsing request body
