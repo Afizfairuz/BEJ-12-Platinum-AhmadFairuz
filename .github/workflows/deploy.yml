@@ -23,15 +23,15 @@ jobs:
             curl -sL https://deb.nodesource.com/setup_20.x | sudo -E bash -
             sudo apt-get install nodejs -y
 
-            npm install -g npm@latest
+            sudo npm install -g npm@latest
 
             # Ensure pm2 is installed
-            npm install -g pm2
+            sudo npm install -g pm2
 
             # Change to the project directory and execute the build script
             cd /home/team2/BEJ-12-Platinum
             git reset --hard; git clean -xdf
             git pull
-            npm i
+            sudo npm i
             pm2 delete main
             pm2 start main.js
