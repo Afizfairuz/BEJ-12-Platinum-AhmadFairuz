@@ -21,7 +21,7 @@ jobs:
             git config --global --add safe.directory /home/team2/BEJ-12-Platinum
 
             curl -sL https://deb.nodesource.com/setup_20.x | sudo -E bash -
-            apt install -y nodejs
+            apt-get install nodejs -y
 
             npm install -g npm@latest
 
