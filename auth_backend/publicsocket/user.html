@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>User</title>
+</head>
+<body>
+  <h1>User Page</h1>
+  <input id="message" placeholder="Type a message" />
+  <button onclick="sendMessage()">Send</button>
+  <div id="messages"></div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    const socket = io('/user');
+
+    socket.on('message', (data) => {
+      const messageElement = document.createElement('div');
+      messageElement.textContent = `Admin says: ${data}`;
+      document.getElementById('messages').appendChild(messageElement);
+    });
+
+    function sendMessage() {
+      const message = document.getElementById('message').value;
+      socket.emit('message', message);
+      document.getElementById('message').value = '';
+    }
+  </script>
+</body>
+</html>
