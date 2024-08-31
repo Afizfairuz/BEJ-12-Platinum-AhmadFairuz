@@ -30,7 +30,7 @@ jobs:
 
             # Change to the project directory and execute the build script
             /home/team2/BEJ-12-Platinum
-            git reset --hard; git clean -xdf
+            sudo git reset --hard; sudo git clean -xdf
             git pull
             npm i
             pm2 delete main
