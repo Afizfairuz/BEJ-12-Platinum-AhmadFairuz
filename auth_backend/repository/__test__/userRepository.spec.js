@@ -75,6 +75,58 @@ it("should update and return the user", async () => {
     expect(result).toBe(1);
   });
 
+   // Positive Case for createToken
+  it("should create token to data user or update user", async () => {
+    const id = 1;
+    const updatedData = { token: "jfbkjwbfjkbFKB", session: "efbwkebfhfh" };
+  
+    const updatedUser = { id, ...updatedData };
+  
+    User.update.mockResolvedValue([1, [updatedUser]]);
+  
+    const user = await userRepository.createToken(id, updatedData.token, updatedData.session);
+    
+    expect(user[1][0]).toEqual(updatedUser);
+  });
+  
+  // Positive Case for deleteToken
+ it("should update to null or delete token and session", async () => {
+   const id = 1;
+   const updatedData = { token: null, session: null };
+ 
+   const updatedUser = { id, ...updatedData };
+ 
+   User.update.mockResolvedValue([1, [updatedUser]]);
+ 
+   const user = await userRepository.deleteToken(id, updatedData.token, updatedData.session);
+   
+   expect(user[1][0]).toEqual(updatedUser);
+ });
+
+  // Positive Case for createOtp
+  it("should create otp to data user or update user", async () => {
+    const id = 1;
+    const updatedData = { otp: 62252 };
+  
+    const updatedUser = { id, ...updatedData };
+  
+    User.update.mockResolvedValue([1, [updatedUser]]);
+  
+    const user = await userRepository.createOtp(id, updatedData.otp);
+    
+    expect(user[1][0]).toEqual(updatedUser);
+  });
+
+  // Positive Case for getUserByOtp
+  it("should return a user by otp", async () => {
+    const otp = "62252";
+    const foundUser = { id: 2, name: "Dave", otp };
+    User.findOne.mockResolvedValue(foundUser);
+
+    const user = await userRepository.getUserByOtp(otp);
+    expect(user).toEqual(foundUser);
+  });
+
   // Negative Case for handling errors
   it("should throw an error when findAll fails", async () => {
     User.findAll.mockRejectedValue(new Error("Database error"));
