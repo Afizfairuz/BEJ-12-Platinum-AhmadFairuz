@@ -5,10 +5,11 @@ const redisClient = require("./auth_backend/config/redis");
 const morgan = require("morgan");
 const multer = require("multer");
 const app = express();
-const upload = require("./utils/uploadStorage");
-const uploadCloudinary = require("./utils/uploadCloudinary");
-const cloudinary = require("./config/config");
+const upload = require('./utils/uploadStorage');
+const uploadCloudinary = require('./utils/uploadCloudinary');
+const cloudinary = require('./config/config')
 const PORT = 8000;
+
 
 // Middleware untuk parsing request body
 app.use(express.json());
@@ -247,6 +248,48 @@ app.post("/auth/otp", async (req, res) => {
   }
 });
 
+// Endpoint Upload Storage & Cloudinary
+app.post("/files/storage/upload", upload.single("image"), (req, res) => {
+  res.send("success");
+});
+
+app.post(
+  "/files/cloudinary/upload",
+  uploadCloudinary.single("image"),
+  async (req, res) => {
+    // TODO: upload to cloudinary storage
+    try {
+      const fileBuffer = req.file?.buffer.toString("base64");
+      const fileString = `data:${req.file?.mimetype};base64,${fileBuffer}`;
+
+      const uploadedFile = await cloudinary.uploader.upload(fileString);
+
+      return res.status(201).send({
+        message: "succes",
+        image: uploadedFile.secure_url,
+      });
+    } catch (error) {
+      return res.status(400).send({
+        message: error,
+      });
+    }
+  }
+);
+
+app.post("/redis", async (req, res) => {
+  const token = req.body.token;
+  const userId = req.body.userId;
+  const dataToSave = {
+    tokens: "token",
+    userIds: "userId",
+  };
+  await redisClient.connect();
+  await redisClient.set("user-2", JSON.stringify(dataToSave));
+  await redisClient.disconnect();
+
+  res.send("success");
+});
+
 app.get("/auth/otp", async (req, res) => {
   try {
     const { otp } = req.body;
@@ -274,6 +317,17 @@ app.get("/auth/otp", async (req, res) => {
 // Endpoint Upload Storage & Cloudinary
 app.post("/files/storage/upload", upload.single("image"), (req, res) => {
   res.send("success");
+});
+
+app.get("/redis", async (req, res) => {
+  await redisClient.connect();
+  const token = await redisClient.get("user-2");
+  await redisClient.disconnect();
+
+  res.send({
+    message: "success",
+    data: token,
+  });
 });
 
 app.post(
@@ -305,8 +359,7 @@ const swaggerDocument = require("./swagger/swagger.json");
 
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
-// export app
-module.exports = app
+
 
 // Menjalankan server
 app.listen(PORT, () => {

@@ -1702,30 +1702,38 @@
                 }
               }
             }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseFailed"
+                }
+              }
+            }
           }
         }
       }
     },
     "/api/promo/get-by-id": {
       "get": {
-        "tags": ["Promo"],
-        "summary": "Get promo by id",
-        "description": "Get promo by id, if none, it returns empty array",
-        "operationId": "getPromoByID",
         "parameters": [
           {
             "name": "id",
             "in": "query",
+            "description": "ID of promo to return",
             "required": true,
+            "explode": true,
             "schema": {
-              "type": "integer",
-              "format": "int64"
+              "type": "string",
+              "default": "1"
             }
           }
         ],
         "responses": {
           "200": {
-            "description": "List of promos",
+            "description": "Found matched promo id",
             "content": {
               "application/json": {
                 "schema": {
@@ -1736,9 +1744,31 @@
                       "example": "Success"
                     },
                     "data": {
-                      "type": "array",
-                      "items": {
-                        "$ref": "#/components/schemas/AllPromo"
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "integer",
+                          "example": 1
+                        },
+                        "description": {
+                          "type": "string",
+                          "example": "Introducing our latest innovation in data management - the [Sample Database Model]. Designed for efficiency and scalability, this model simplifies your data operations and ensures seamless integration with your existing systems."
+                        },
+                        "promoImage": {
+                          "type": "string",
+                          "format": "url",
+                          "example": "https://unsplash.com/photos/a-person-holding-a-camera-in-front-of-a-group-of-people-o4oYRBB1BEg"
+                        },
+                        "createdAt": {
+                          "type": "string",
+                          "format": "YYYY-MM-ddTHH:MM:ss.SSSZ",
+                          "example": "2024-07-20T14:31:07.395Z"
+                        },
+                        "updatedAt": {
+                          "type": "string",
+                          "format": "YYYY-MM-ddTHH:MM:ss.SSSZ",
+                          "example": "2024-07-20T14:31:07.395Z"
+                        }
                       }
                     }
                   }
@@ -1756,7 +1786,13 @@
               }
             }
           }
-        }
+        },
+        "operationId": "getPromById",
+        "description": "Get promo by passing the id number as the query",
+        "summary": "Get promo by id",
+        "tags": [
+          "promo"
+        ]
       }
     }
   },
@@ -2112,7 +2148,7 @@
           },
           "totalPrice": {
             "type": "integer",
-            "example": 200.0
+            "example": 200
           },
           "createdAt": {
             "type": "string",
@@ -2143,7 +2179,7 @@
           },
           "totalPrice": {
             "type": "integer",
-            "example": 1200.0
+            "example": 1200
           }
         },
         "required": ["userId", "productId", "quantity", "totalPrice"]
@@ -2165,7 +2201,7 @@
           },
           "totalPrice": {
             "type": "integer",
-            "example": 700.0
+            "example": 700
           }
         }
       }
