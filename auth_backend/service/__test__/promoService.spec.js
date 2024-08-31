@@ -105,9 +105,9 @@ describe('PromoService', () => {
             const mockPromo = { id: 1, name: 'Updated Promo' };
             mockRepository.getById.mockResolvedValue(null);
 
-            await promoService.update(mockPromo);
-
-            expect(Common.responseToFE).toHaveBeenCalledWith(false, 403, null, 'id not found');
+            const updatePromo = await promoService.update(mockPromo);
+            const response = Common.responseToFE(false, 403, null, 'id not found'); 
+            expect(updatePromo).toEqual(response);
         });
 
         it('should handle other errors and return error response', async () => {
