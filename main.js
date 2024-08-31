@@ -57,7 +57,7 @@ const CategoryRepository = require("./auth_backend/repository/categoryRepository
 const OrderRepository = require("./auth_backend/repository/OrderRepository");
 const ItemRepository = require("./auth_backend/repository/ItemRepository");
 const PaymentRepository = require("./auth_backend/repository/paymentRepository");
-// const MailRepository = require("./auth_backend/repository/mailRepository");
+const MailRepository = require("./auth_backend/repository/mailRepository");
 
 const userRepository = new UserRepository();
 const productRepository = new ProductRepository();
@@ -65,7 +65,7 @@ const categoryRepository = new CategoryRepository();
 const orderRepository = new OrderRepository();
 const itemRepository = new ItemRepository();
 const paymentRepository = new PaymentRepository();
-// const mailRepository = new MailRepository();
+const mailRepository = new MailRepository();
 
 // Inisialisasi service
 const UserService = require("./auth_backend/service/userService");
@@ -82,7 +82,7 @@ const categoryService = new CategoryService(categoryRepository);
 const orderService = new OrderService(orderRepository);
 const itemService = new ItemService(itemRepository);
 const paymentService = new PaymentService(paymentRepository);
-// const authService = new AuthService(userRepository, mailRepository);
+const authService = new AuthService(userRepository, mailRepository);
 
 // Inisialisasi handler
 const UserHandler = require("./auth_backend/handler/userHandler");
@@ -99,7 +99,7 @@ const categoryHandler = new CategoryHandler(categoryService);
 const orderHandler = new OrderHandler(orderService);
 const itemHandler = new ItemHandler(itemService);
 const paymentHandler = new PaymentHandler(paymentService);
-const authHandler = new AuthHandler(AuthService);
+const authHandler = new AuthHandler(authService);
 
 const authMiddleware = require("./auth_backend/middleware/auth");
 
@@ -157,11 +157,11 @@ app.get("/images/binar.png", (req, res) => {
 app.post("/auth/register", (req, res) => authHandler.register(req, res));
 app.post("/auth/login", (req, res) => authHandler.login(req, res));
 app.patch("/auth/token/:id", (req, res) => authHandler.createToken(req, res));
-app.get("/auth/token/:id", (req, res) => authHandler.getUserById(req, res));
 app.patch("/auth/logout/:id", (req, res) => authHandler.logout(req, res));
+app.get("/auth/otp", (req, res) => authHandler.validateOtp(req, res));
 
-// Redis
-app.post("/auth/redis", async (req, res) => {
+// Redis untuk auth
+app.post("/auth/token", async (req, res) => {
   const { token, session, userId } = req.body;
   const dataToSave = {
     token: token,
@@ -172,7 +172,7 @@ app.post("/auth/redis", async (req, res) => {
   try {
     await redisClient.connect();
     await redisClient.set(`user-${userId}`, JSON.stringify(dataToSave));
-    res.send("success");
+    res.send("success menyimpan token");
   } catch (error) {
     res.status(500).send("terjadi kesalahan:", error);
   } finally {
@@ -180,7 +180,7 @@ app.post("/auth/redis", async (req, res) => {
   }
 });
 
-app.get("/auth/redis/:userId", async (req, res) => {
+app.get("/auth/token/:userId", async (req, res) => {
   try {
     const { userId } = req.params;
 
@@ -189,7 +189,7 @@ app.get("/auth/redis/:userId", async (req, res) => {
 
     if (data) {
       res.status(200).send({
-        message: "success",
+        message: "success mendapatkan data",
         data: data,
       });
     } else {
@@ -204,7 +204,7 @@ app.get("/auth/redis/:userId", async (req, res) => {
   }
 });
 
-app.delete("/auth/redis/:userId", async (req, res) => {
+app.delete("/auth/token/:userId", async (req, res) => {
   try {
     const { userId } = req.params;
 
@@ -223,6 +223,24 @@ app.delete("/auth/redis/:userId", async (req, res) => {
         message: "gagal logout",
       });
     }
+  } catch (error) {
+    res.status(500).send("terjadi kesalahan:", error);
+  } finally {
+    await redisClient.disconnect();
+  }
+});
+
+app.post("/auth/otp", async (req, res) => {
+  const { otp, userId } = req.body;
+  const dataToSave = {
+    otp: otp,
+    userId: userId,
+  };
+
+  try {
+    await redisClient.connect();
+    await redisClient.set(`user-${userId}`, JSON.stringify(dataToSave));
+    res.send("success menyimpan otp");
   } catch (error) {
     res.status(500).send("terjadi kesalahan:", error);
   } finally {
@@ -272,6 +290,35 @@ app.post("/redis", async (req, res) => {
   res.send("success");
 });
 
+app.get("/auth/otp", async (req, res) => {
+  try {
+    const { otp } = req.body;
+
+    await redisClient.connect();
+    const data = await redisClient.get(`user-${otp}`);
+
+    if (data) {
+      res.status(200).send({
+        message: "success mendapatkan data",
+        data: data,
+      });
+    } else {
+      res.status(400).send({
+        message: "data tidak ditemukan",
+      });
+    }
+  } catch (error) {
+    res.status(500).send("terjadi kesalahan:", error);
+  } finally {
+    await redisClient.disconnect();
+  }
+});
+
+// Endpoint Upload Storage & Cloudinary
+app.post("/files/storage/upload", upload.single("image"), (req, res) => {
+  res.send("success");
+});
+
 app.get("/redis", async (req, res) => {
   await redisClient.connect();
   const token = await redisClient.get("user-2");
@@ -282,14 +329,38 @@ app.get("/redis", async (req, res) => {
     data: token,
   });
 });
-//  faruuq changes 222
-//Swagger
+
+app.post(
+  "/files/cloudinary/upload",
+  uploadCloudinary.single("image"),
+  async (req, res) => {
+    // TODO: upload to cloudinary storage
+    try {
+      const fileBuffer = req.file?.buffer.toString("base64");
+      const fileString = `data:${req.file?.mimetype};base64,${fileBuffer}`;
+
+      const uploadedFile = await cloudinary.uploader.upload(fileString);
+
+      return res.status(201).send({
+        message: "succes",
+        image: uploadedFile.secure_url,
+      });
+    } catch (error) {
+      return res.status(400).send({
+        message: error,
+      });
+    }
+  }
+);
+
+// Swagger
 const swaggerUi = require("swagger-ui-express");
 const swaggerDocument = require("./swagger/swagger.json");
 
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 
+module.exports = app
 
 // Menjalankan server
 app.listen(PORT, () => {

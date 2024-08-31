@@ -36,6 +36,10 @@ User.init(
       type: DataTypes.STRING,
       allowNull: true,
     },
+    otp: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+    },
     profilePicture: {
       type: DataTypes.STRING,
       allowNull: true,
