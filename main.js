@@ -299,11 +299,14 @@ app.post(
   }
 );
 
-//Swagger
+// Swagger
 const swaggerUi = require("swagger-ui-express");
 const swaggerDocument = require("./swagger/swagger.json");
 
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+
+// export app
+module.exports = app
 
 // Menjalankan server
 app.listen(PORT, () => {
