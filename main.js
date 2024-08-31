@@ -360,6 +360,7 @@ const swaggerDocument = require("./swagger/swagger.json");
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 
+module.exports = app
 
 // Menjalankan server
 app.listen(PORT, () => {
